@@ -2066,10 +2066,10 @@ react-dom@^18, react-dom@^18.2.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.0"
 
-react-elvis@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/react-elvis/-/react-elvis-1.0.2.tgz#326112d75d07a8773568cf8374b82a24fbf0f613"
-  integrity sha512-fd9MX9E0OBak5wc1KAmOZI53gFIbukhAQRNua7fOs5jPl8dL5yWQlGjpl3glL5P7MWxGYb7JvjxGsi2kK/dZQw==
+react-elvis@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-elvis/-/react-elvis-1.0.3.tgz#7601fe6505256efaad85edd6ee38e08b0a019625"
+  integrity sha512-KtQFoaxs7mDZqbBACxGrnIG5uUD/ypBYHTJaIXWhJE7V5XqJbipIo8FYz66rTXIocb5NcHT1ybaqPeBykhDbJA==
   dependencies:
     react "^18.2.0"
     react-dom "^18.2.0"

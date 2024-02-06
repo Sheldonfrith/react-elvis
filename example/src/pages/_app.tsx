@@ -1,18 +1,11 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import ElvisProvider from "../components/contexts/ElvisContext";
 import { Metadata } from "next";
+import { ElvisProvider } from "react-elvis";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ElvisProvider
-      config={
-        {
-          // disableDefaultErrorDisplayerCheck: true,
-          // disableDefaultLoadingDisplayerCheck: true,
-        }
-      }
-    >
+    <ElvisProvider>
       <Component {...pageProps} />
     </ElvisProvider>
   );
