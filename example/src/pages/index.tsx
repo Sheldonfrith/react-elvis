@@ -26,7 +26,7 @@ https://github.com/Sheldonfrith/react-elvis
 import ExampleForm_NoFeedbackDisplay from "../components/example-forms/ExampleForm_NoFeedbackDisplay";
 import ExampleForm_FeedbackAtBottomOnly from "../components/example-forms/ExampleForm_FeedbackAtBottomOnly";
 import ExampleForm_IntegratedFeedback from "../components/example-forms/ExampleForm_IntegratedFeedback";
-import LoadingSpinner from "../components/elvis-default/LoadingSpinner";
+import { ElvisDefault } from "react-elvis";
 
 export default function Home() {
   return (

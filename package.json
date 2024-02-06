@@ -1,8 +1,9 @@
 {
   "name": "react-elvis",
-  "version": "1.0.0",
+  "version": "1.0.02",
   "description": "Error and Loading Visualizer for React",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "directories": {
     "example": "example",
     "lib": "lib"
