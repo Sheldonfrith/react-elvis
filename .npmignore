@@ -1,5 +1,3 @@
 # Ignore everything
-*
-
-# Include the "dist" directory
-!dist/
+lib
+example
