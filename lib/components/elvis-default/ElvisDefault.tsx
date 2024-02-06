@@ -27,10 +27,8 @@ import React, { ReactNode, useCallback, useEffect, useState } from "react";
 
 import CustomizableButton from "./CustomizableButton";
 import LoadingSpinner from "./LoadingSpinner";
-import {
-  useRegisterDefaultErrorDisplay,
-  useRegisterDefaultLoadingDisplay,
-} from "../..";
+import { useRegisterDefaultErrorDisplay } from "../../hooks/useRegisterDefaultErrorDisplay";
+import { useRegisterDefaultLoadingDisplay } from "../../hooks/useRegisterDefaultLoadingDisplay";
 
 const defaultProps: ElvisDefaultProps = {
   colors: {

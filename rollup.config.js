@@ -10,11 +10,16 @@ export default {
   input: "./lib/index.ts",
   output: [
     {
+      name: pkg.name,
       file: pkg.main,
-      format: "cjs",
+      format: "umd",
       exports: "named",
       sourcemap: true,
       strict: false,
+      globals: {
+        react: "React",
+        "react-dom": "ReactDOM",
+      },
     },
   ],
   plugins: [
