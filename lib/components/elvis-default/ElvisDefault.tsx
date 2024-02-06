@@ -86,7 +86,7 @@ interface OptionalElvisDefaultProps {
   text?: Partial<ElvisDefaultText>;
 }
 
-const ElvisDefault: React.FC<OptionalElvisDefaultProps> = (props) => {
+export const ElvisDefault: React.FC<OptionalElvisDefaultProps> = (props) => {
   const p: ElvisDefaultProps = { ...defaultProps };
   p.colors = { ...p.colors, ...props.colors };
   p.hoverColors = { ...p.hoverColors, ...props.colors };
@@ -297,5 +297,3 @@ const ElvisDefault: React.FC<OptionalElvisDefaultProps> = (props) => {
     </div>
   );
 };
-
-export default ElvisDefault;

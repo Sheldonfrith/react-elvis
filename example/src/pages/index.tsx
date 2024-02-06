@@ -27,7 +27,6 @@ import ExampleForm_NoFeedbackDisplay from "../components/example-forms/ExampleFo
 import ExampleForm_FeedbackAtBottomOnly from "../components/example-forms/ExampleForm_FeedbackAtBottomOnly";
 import ExampleForm_IntegratedFeedback from "../components/example-forms/ExampleForm_IntegratedFeedback";
 import { ElvisDefault } from "react-elvis";
-
 export default function Home() {
   return (
     <main

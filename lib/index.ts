@@ -33,3 +33,4 @@ export {
   ElvisContext,
   ElvisProvider,
 } from "./components/contexts/ElvisContext";
+export { ElvisDefault } from "./components/elvis-default/ElvisDefault";
