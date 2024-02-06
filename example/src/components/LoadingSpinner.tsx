@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,57 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+import React from "react";
+
+interface LoadingSpinnerProps {
+  size?: string;
+  color?: string;
+}
+const LoadingSpinner: React.FunctionComponent<LoadingSpinnerProps> = ({
+  size,
+  color,
+}) => {
+  if (!color) {
+    color = "white";
+  }
+  return (
+    <span
+      style={{
+        fontSize: size || "1em",
+        verticalAlign: "middle",
+      }}
+    >
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `.elvis-loading-spinner {
+  display: inline-block;
+  width: 2.5em;
+  height: 2.5em;
+}
+.elvis-loading-spinner:after {
+  content: " ";
+  display: block;
+  width: 2.5em;
+  height: 2.5em;
+  margin: 0.2em;
+  border-radius: 50%;
+  border: 0.3em solid ${color};
+  animation: elvis-loading-spinner 1.0s linear infinite;
+  border-color: ${color} transparent ${color} transparent;
+}
+@keyframes elvis-loading-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}`,
+        }}
+      />
+      <div className="elvis-loading-spinner"></div>
+    </span>
+  );
+};
+export default LoadingSpinner;

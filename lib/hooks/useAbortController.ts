@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,25 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+
+import { useCallback, useState } from "react";
+
+export function useAbortController() {
+  const [controller, setController] = useState<AbortController>(() => {
+    const c = new AbortController();
+    c.signal.onabort = () => {
+      resetAbortController();
+    };
+    return c;
+  });
+  const resetAbortController = useCallback(() => {
+    const newController = new AbortController();
+    newController.signal.onabort = () => {
+      resetAbortController();
+    };
+    setController(newController);
+  }, [setController]);
+
+  return controller;
+}

@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,30 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+import { useContext, useCallback } from "react";
+import { useAbortController } from "./useAbortController";
+import { ElvisContext } from "../components/contexts/ElvisContext";
+import { ElvisDisplayConfig } from "../config/types";
+
+export function useWrap_Abortable<T extends any[]>(
+  name: string,
+  callback: (controller: AbortController, ...args: T) => Promise<any>,
+  config: ElvisDisplayConfig
+) {
+  const abortController = useAbortController();
+  const context = useContext(ElvisContext);
+  return {
+    f: useCallback(
+      (...args: T) => {
+        const r = context.wrapAsyncFunction_Abortable(
+          { identifier: name, callback, config, abortController },
+          args
+        );
+        return r;
+      },
+      [context, abortController]
+    ),
+    abortController,
+  };
+}

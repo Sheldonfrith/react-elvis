@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,9 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+export function assert(condition: any, message?: string): asserts condition {
+  if (!condition) {
+    throw new Error(message || "Assertion failed: " + condition);
+  }
+}

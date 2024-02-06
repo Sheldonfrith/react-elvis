@@ -1,0 +1,5 @@
+# Ignore everything
+*
+
+# Include the "dist" directory
+!dist/

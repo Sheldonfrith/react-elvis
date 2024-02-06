@@ -1,0 +1,40 @@
+{
+  "name": "react-elvis",
+  "version": "1.0.0",
+  "description": "Error and Loading Visualizer for React",
+  "main": "index.js",
+  "directories": {
+    "example": "example",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sheldonfrith/react-elvis.git"
+  },
+  "keywords": [
+    "react",
+    "error",
+    "loading",
+    "feedback",
+    "typescript",
+    "headless"
+  ],
+  "author": "Sheldon Frith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sheldonfrith/react-elvis/issues"
+  },
+  "homepage": "https://github.com/Sheldonfrith/react-elvis#readme",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tsc": "^2.0.4",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.55"
+  }
+}

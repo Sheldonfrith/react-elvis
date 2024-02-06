@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,18 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+export function deepOverwrite(obj1: any, ...objects: any[]) {
+  for (const obj of objects) {
+    for (let k in obj) {
+      let vs = obj[k],
+        vt = obj1[k];
+      if (Object(vs) == vs && Object(vt) === vt) {
+        obj1[k] = deepOverwrite(vt, vs);
+        continue;
+      }
+      obj1[k] = obj[k];
+    }
+  }
+  return obj1;
+}

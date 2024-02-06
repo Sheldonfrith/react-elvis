@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,11 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+
+export const standardButton = " p-2 rounded-md m-4 w-full max-h-10 h-10 ";
+export const goodButton = ` ${standardButton} bg-green-500 text-white hover:bg-green-600 `;
+export const badButton = ` ${standardButton} bg-red-500 text-white hover:bg-red-600 `;
+export const neutralButton = ` ${standardButton} bg-gray-500 text-white hover:bg-gray-600 `;
+export const primaryButton = ` ${standardButton} bg-blue-500 text-white hover:bg-blue-600 `;
+export const disabledButton = ` ${standardButton} bg-gray-500 text-gray-500 cursor-not-allowed `;

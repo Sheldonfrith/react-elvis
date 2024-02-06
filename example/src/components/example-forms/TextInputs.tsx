@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,45 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useRef,
+} from "react";
+
+interface TextInputProps {
+  classNameOverride?: string;
+  onChangeOverride?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  children?: React.ReactNode;
+}
+const TextInput: React.FunctionComponent<TextInputProps> = ({
+  classNameOverride,
+  onChangeOverride,
+  children,
+}) => {
+  return (
+    <div className="flex flex-row w-full justify-between">
+      <div>
+        <label className=" p-2  whitespace-nowrap rounded-md text-white w-18 mr-16 text-lg">
+          Delay:
+        </label>
+        <input
+          className={
+            classNameOverride ||
+            "border border-black p-2 w-56 rounded-md text-black"
+          }
+          onChange={onChangeOverride}
+          id="timeToComplete"
+          name="timeToComplete"
+          type="text"
+          placeholder="seconds"
+        />
+      </div>
+      {children}
+    </div>
+  );
+};
+export default TextInput;

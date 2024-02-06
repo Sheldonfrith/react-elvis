@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,29 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+import { useContext, useCallback } from "react";
+import { ElvisContext } from "../components/contexts/ElvisContext";
+import { ElvisDisplayConfig } from "../config/types";
+
+export function useWrap<T extends any[]>(
+  name: string,
+  callback: (...args: T) => Promise<any>,
+  config: ElvisDisplayConfig
+) {
+  const context = useContext(ElvisContext);
+
+  return useCallback(
+    (...args: Parameters<typeof callback>) => {
+      return context.wrapAsyncFunction(
+        {
+          identifier: name,
+          callback,
+          config,
+        },
+        args
+      );
+    },
+    [context]
+  );
+}

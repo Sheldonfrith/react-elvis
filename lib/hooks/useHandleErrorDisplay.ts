@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,9 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+import { useErrorDisplaySetup } from "./useErrorDisplaySetup";
+
+export function useHandleErrorDisplay(identifier: string) {
+  return useErrorDisplaySetup("standard", identifier);
+}

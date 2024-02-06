@@ -1,4 +1,4 @@
-MIT License
+/**MIT License
 
 Copyright (c) 2024 Sheldon Frith
 
@@ -22,3 +22,40 @@ SOFTWARE.
 
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
+*/
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useRef,
+} from "react";
+import { deepOverwrite } from "../../helpers/deepOverwrite";
+
+interface CustomizableButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  hoverStyle?: React.CSSProperties;
+}
+const CustomizableButton: React.FunctionComponent<CustomizableButtonProps> = (
+  props
+) => {
+  const [s, setS] = useState<React.CSSProperties | undefined>(props.style);
+  const { hoverStyle, style, children, ...passThroughProps } = props;
+  return (
+    <button
+      {...passThroughProps}
+      style={s}
+      onMouseEnter={(e) => {
+        setS(deepOverwrite({ ...props.style }, { ...props.hoverStyle }));
+        props.onMouseEnter ? props.onMouseEnter(e) : null;
+      }}
+      onMouseLeave={(e) => {
+        setS(props.style);
+        props.onMouseLeave ? props.onMouseLeave(e) : null;
+      }}
+    >
+      {props.children}
+    </button>
+  );
+};
+export default CustomizableButton;
