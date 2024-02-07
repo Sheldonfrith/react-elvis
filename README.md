@@ -1,6 +1,8 @@
 # React-Elvis (Error and Loading Visualizer)
 
-Makes it easy to show error, loading, cancelled, and success states to your user for ANY ASYNC FUNCTION (external api/http requests, database requests, internal long-running processes, etc).
+Easiest tool for showing error, loading, cancelled, and success states to your user for **any async function**...
+
+*... http requests, database requests, internal long-running processes, etc*
 
 ## Installation
 
@@ -14,9 +16,9 @@ OR
 yarn add react-elvis
 ```
 
-## Basic Usage
+# Basic Usage
 
-1. Wrap your App Component with ElvisProvider
+## 1. Wrap your App (Top Level) Component with ElvisProvider
 
 ```
 import { ElvisProvider } from "react-elvis";
@@ -30,9 +32,9 @@ export default function App() {
 }
 ```
 
-_`ElvisProvider` is a react context. Any component that wants to use react-elvis must be a child of this `ElvisProvider`._
+_`ElvisProvider` is a react context. Any component that wants to use react-elvis must be a child of `ElvisProvider`._
 
-2. Choose a Default Displayer Component
+## 2. Choose a Default Displayer Component
 
 _We provide a ready-made, configurable default displayer using popups, if you dont want to bother with making your own._
 
@@ -49,7 +51,7 @@ export default function Page(){
 }
 ```
 
-3. Wrap any Async Function
+## 3. Wrap any Async Function
 
 ```
 import * as elvis from "react-elvis";
@@ -74,15 +76,15 @@ export default function AnyComponent(){
 }
 ```
 
-4. Use the Wrapped Function Normally
+## 4. Use the Wrapped Function Normally
 
 Thats it. When you call this function your user's will now be able to see that something is loading, they will be notified about errors, and they will also see success and cancellation states.
 
 _Note: This only works within react components, contexts, or hooks._
 
-## Advanced Usage:
+# Advanced Usage:
 
-1. Configure the ElvisProvider
+### 1. Configure the ElvisProvider
 
 **Example:**
 
@@ -113,7 +115,7 @@ export type ElvisConfig = {
 };
 ```
 
-2. Create Custom Display Components
+### 2. Create Custom Display Components
 
 #### Basic Usage (See the "example" app for details and advanced usage):
 
@@ -130,19 +132,19 @@ export function SomeReactComponent(){
   const timeToDisplaySuccessState = 500;
   const { loading, cancelled, success, abortController } = elvis.useHandleLoadingDisplay("MyFunctionName", timeToDisplayCancelledState, timeToDisplaySuccessState);
 
-if (loading){
-    return <p>{loading.title}</p>
-}
-if (error){
-    return <p>{error.message}</p>
-}
-return <p>Ready</p>;
+  if (loading){
+      return <p>{loading.title}</p>
+  }
+  if (error){
+      return <p>{error.message}</p>
+  }
+  return <p>Ready</p>;
 
 }
 
 ```
 
-### Or, for a Default Display Component:
+#### Or, for a Default Display Component:
 
 ```
 ...
@@ -152,9 +154,7 @@ return <p>Ready</p>;
 ...
 ```
 
-###
-
-3. Customize Displays for an Async Function
+### 3. Customize Displays for an Async Function
 
 ```
 import * as elvis from "react-elvis";
