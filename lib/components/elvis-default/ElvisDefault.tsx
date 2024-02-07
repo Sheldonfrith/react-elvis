@@ -31,6 +31,8 @@ import { useRegisterDefaultErrorDisplay } from "../../hooks/useRegisterDefaultEr
 import { useRegisterDefaultLoadingDisplay } from "../../hooks/useRegisterDefaultLoadingDisplay";
 
 const defaultProps: ElvisDefaultProps = {
+  cancelledStatusDuration_ms: 500,
+  successStatusDuration_ms: 500,
   colors: {
     neutral: "gray",
     good: "green",
@@ -73,12 +75,16 @@ interface ElvisDefaultText {
 }
 
 interface ElvisDefaultProps {
+  cancelledStatusDuration_ms: number;
+  successStatusDuration_ms: number;
   colors: ElvisDefaultColors;
   hoverColors: ElvisDefaultColors;
   text: ElvisDefaultText;
 }
 
 interface OptionalElvisDefaultProps {
+  cancelledStatusDuration_ms?: number;
+  successStatusDuration_ms?: number;
   colors?: Partial<ElvisDefaultColors>;
   fontFamily?: Partial<ElvisDefaultFontFamily>;
   text?: Partial<ElvisDefaultText>;
@@ -93,7 +99,10 @@ export const ElvisDefault: React.FC<OptionalElvisDefaultProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { error, clearError, residualError } = useRegisterDefaultErrorDisplay();
   const { loading, cancelled, success, abortController } =
-    useRegisterDefaultLoadingDisplay(2000, 3000);
+    useRegisterDefaultLoadingDisplay(
+      p.cancelledStatusDuration_ms,
+      p.successStatusDuration_ms
+    );
 
   // control isOpen
   useEffect(() => {
