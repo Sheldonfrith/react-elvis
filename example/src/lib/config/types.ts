@@ -24,6 +24,14 @@ For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
 
+export type ElvisDisplayConfig = {
+  defaultError?: UserFacingError;
+  loading?: UserFacingLoading;
+  success?: UserFacingSuccess;
+  cancelled?: UserFacingCancelled;
+  definedErrors?: UserFacingErrorFilter[];
+};
+
 export type UserFacingError = {
   title: string;
   message: string;
@@ -63,14 +71,6 @@ export type ErrorDisplayer = {
   onErrorDetected: (error: UserFacingError) => void;
   onNewFunctionCall: () => void;
   onlyTheseErrors?: ((error: unknown) => boolean)[];
-};
-
-export type ElvisDisplayConfig = {
-  defaultError?: UserFacingError;
-  loading?: UserFacingLoading;
-  success?: UserFacingSuccess;
-  cancelled?: UserFacingCancelled;
-  definedErrors?: UserFacingErrorFilter[];
 };
 
 export type UserFacingAsyncFunction<ArgsType extends any[]> = {

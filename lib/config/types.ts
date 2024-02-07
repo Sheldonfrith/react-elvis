@@ -24,9 +24,12 @@ For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
 export type ElvisConfig = {
-  graceTimeToDetectDefaultDisplayers?: number;
-  disableDefaultErrorDisplayerCheck?: boolean;
-  disableDefaultLoadingDisplayerCheck?: boolean;
+  graceTimeToDetectDefaultDisplayers?: number; //1000
+  // in milliseconds, use if your default display component might take longer than usual to render
+
+  disableDefaultErrorDisplayerCheck?: boolean; // false
+  disableDefaultLoadingDisplayerCheck?: boolean; // false
+  // not recommended, React-Elvis will throw errors if it cannot find a way to display a loading or error state
 };
 
 export type UserFacingError = {
