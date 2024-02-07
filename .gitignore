@@ -84,7 +84,8 @@ web_modules/
 .parcel-cache
 
 # Next.js build output
-.next
+# I'm putting the build on GitHub for faster updates to the live site, since the server does not have enough ram to build the site, only to serve it.
+# .next
 out
 
 # Nuxt.js build / generate output
