@@ -229,7 +229,3 @@ export type UserFacingErrorFilter = (
   error: unknown
 ) => UserFacingError | undefined;
 ```
-
-## TODO
-
-- Add regression tests to allow future collaboration
