@@ -60,19 +60,23 @@ async function AnyAsyncFunction (anyArgs){
     // do anything
 }
 
-// abortController argument must come first
+export default function AnyComponent(){
+    const MyFunctionName = elvis.useWrap("MyFunctionName", AnyAsyncFunction )
+    ....
+}
+```
+**OR, If you want to make it cancellable (ie. have access to the `AbortController`):**
+```TSX
+import * as elvis from "react-elvis";
 
+// abortController argument must come first
 async function AnyCancellableAsyncFunction (abortController, anyOtherArgs){
     // do anything
 }
 
 export default function AnyComponent(){
-    const MyFunctionName = elvis.useWrap("MyFunctionName", AnyAsyncFunction )
-
-    // OR IF YOU WANT ACCESS TO THE ABORTCONTROLLER FOR CANCELLING THE ASYNC FUNCTION DO THIS ...
-
     const { f: MyFunctionName, abortController } = elvis.useWrap_Abortable("MyFunctionName", AnyCancellableAsyncFunction);
-
+    ....
 }
 ```
 
