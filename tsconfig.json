@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react",
-    "incremental": true,
+    // "incremental": true,
     "paths": {
       "@/*": ["./lib/*"]
     },
