@@ -41,12 +41,12 @@ _We provide a ready-made, configurable default displayer using popups, if you do
 ```TSX
 import { ElvisDefault } from "react-elvis";
 
-export default function Page(){
+// You should choose a component that will always be rendered, application-wide, so your user can always see error and loading states
+export default function SomeComponent(){
     return (
-        <div>
-            // SOME TOP-LEVEL COMPONENT
+        ...
             <ElvisDefault />
-        </div>
+        ...
     );
 }
 ```
