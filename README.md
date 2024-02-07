@@ -6,13 +6,13 @@ Easiest tool for showing error, loading, cancelled, and success states to your u
 
 ## Installation
 
-```
+```Shell
 npm install react-elvis
 ```
 
 OR
 
-```
+```shell
 yarn add react-elvis
 ```
 
@@ -20,7 +20,7 @@ yarn add react-elvis
 
 ## 1. Wrap your App (Top Level) Component with ElvisProvider
 
-```
+```TSX
 import { ElvisProvider } from "react-elvis";
 
 export default function App() {
@@ -38,7 +38,7 @@ _`ElvisProvider` is a react context. Any component that wants to use react-elvis
 
 _We provide a ready-made, configurable default displayer using popups, if you dont want to bother with making your own._
 
-```
+```TSX
 import { ElvisDefault } from "react-elvis";
 
 export default function Page(){
@@ -53,7 +53,7 @@ export default function Page(){
 
 ## 3. Wrap any Async Function
 
-```
+```TSX
 import * as elvis from "react-elvis";
 
 async function AnyAsyncFunction (anyArgs){
@@ -88,7 +88,7 @@ _Note: This only works within react components, contexts, or hooks._
 
 **Example:**
 
-```
+```TSX
 import { ElvisProvider } from "react-elvis";
 
 export default function App() {
@@ -104,7 +104,7 @@ export default function App() {
 
 **Details:**
 
-```
+```TSX
 export type ElvisConfig = {
   graceTimeToDetectDefaultDisplayers?: number; //1000
   // in milliseconds, use if your default display component might take longer than usual to render
@@ -119,7 +119,7 @@ export type ElvisConfig = {
 
 #### Basic Usage (See the "example" app for details and advanced usage):
 
-```
+```TSX
 import * as elvis from 'react-elvis';
 
 
@@ -146,7 +146,7 @@ export function SomeReactComponent(){
 
 #### Or, for a Default Display Component:
 
-```
+```TSX
 ...
   const { error, clearError, residualError } = elvis.useRegisterDefaultErrorDisplay();
   const { loading, cancelled, success, abortController } =
@@ -156,7 +156,7 @@ export function SomeReactComponent(){
 
 ### 3. Customize Displays for an Async Function
 
-```
+```TSX
 import * as elvis from "react-elvis";
 
 async function AnyAsyncFunction (anyArgs){
@@ -192,7 +192,7 @@ export default function AnyComponent(){
 
 ##### Details:
 
-```
+```TSX
 
 export type ElvisDisplayConfig = {
   defaultError?: UserFacingError;
