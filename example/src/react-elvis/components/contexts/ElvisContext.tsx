@@ -47,6 +47,7 @@ import {
   DefaultUserFacingSuccess,
   unhandledPromiseRejectionError,
 } from "../../config/messages";
+import { useAbortController } from "../../hooks/useAbortController";
 
 //initialize state structure here
 export const ElvisContext = React.createContext({
@@ -66,6 +67,11 @@ export const ElvisContext = React.createContext({
   registerErrorDisplayer: (c: ErrorDisplayer) => {},
   registerDefaultLoadingDisplayer: (c: LoadingDisplayer) => {},
   registerDefaultErrorDisplayer: (c: ErrorDisplayer) => {},
+  useDELETE_ME_useWrapTest: <T extends any[]>(
+    callback: (controller: AbortController, ...args: T) => Promise<any>
+  ): ((...args: T) => Promise<any>) => {
+    return async (...args: T) => {};
+  },
 });
 
 export const ElvisProvider: React.FunctionComponent<
@@ -314,6 +320,29 @@ export const ElvisProvider: React.FunctionComponent<
   function registerDefaultLoadingDisplayer(c: LoadingDisplayer) {
     setDefaultLoadingDisplayer({ ...c });
   }
+  const useDELETE_ME_useWrapTest = useCallback(
+    <T extends any[]>(
+      callback: (abortController: AbortController, ...args: T) => Promise<any>
+    ) => {
+      //removed args,
+      const abortController = useAbortController();
+      // return async () => console.log("inttttttt", callback());
+      // return useCallback(
+      // async (...args: T) => {
+      // return callback(abortController, ...args);
+      // },
+      // [abortController]
+      // );
+      return async (...args: T) => {
+        return await callback(abortController, ...args);
+      };
+    },
+    []
+  );
+  // the callback from child function that relies on child state
+  // is passed to a callback in parent function that relies on parent state
+  // then it is called, in the parent function
+
   return (
     <ElvisContext.Provider
       value={{
@@ -323,6 +352,7 @@ export const ElvisProvider: React.FunctionComponent<
         registerErrorDisplayer,
         registerDefaultLoadingDisplayer,
         registerDefaultErrorDisplayer,
+        useDELETE_ME_useWrapTest,
       }}
     >
       {children}

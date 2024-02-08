@@ -26,7 +26,13 @@ https://github.com/Sheldonfrith/react-elvis
 import ExampleForm_NoFeedbackDisplay from "../components/example-forms/ExampleForm_NoFeedbackDisplay";
 import ExampleForm_FeedbackAtBottomOnly from "../components/example-forms/ExampleForm_FeedbackAtBottomOnly";
 import ExampleForm_IntegratedFeedback from "../components/example-forms/ExampleForm_IntegratedFeedback";
+import { TestContext } from "../components/TestContext";
+import { useContext } from "react";
+import { Test2Context } from "../components/Test2Context";
 export default function Home() {
+  const context = useContext(TestContext);
+  const context2 = useContext(Test2Context);
+  const func = context.testFunction2(context2.testFunction2_Inner);
   return (
     <main
       className={`flex w-full min-h-screen flex-col items-center justify-between p-24`}
@@ -44,6 +50,13 @@ export default function Home() {
         💡 Type something non-numeric to see how input errors can be
         displayed...
       </i>
+      <button
+        onClick={() => {
+          func();
+        }}
+      >
+        TestFunction
+      </button>
       {/* <ElvisDefault /> */}
       <h2 className={`text-2xl font-bold text-center`}>
         {" "}

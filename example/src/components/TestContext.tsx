@@ -14,61 +14,28 @@ import * as elvis from "../react-elvis";
 
 //initialize state structure here
 export const TestContext = React.createContext({
-  testAsyncFunctionThatRequiresState: {
-    f: (
-      timeToCompletion: string | undefined,
-      returnType: string | undefined
-    ): Promise<any> => Promise.resolve(),
-    abortController: new AbortController(),
-  },
   returnType: "2" as string | undefined,
-  timeToCompletion: "1" as string | undefined,
   setReturnType: (v: string) => {},
-  setTimeToCompletion: (v: string) => {},
+  testFunction2: (callback: (...args: any) => Promise<any>) => () => {},
 });
 
 const TestProvider: React.FunctionComponent<PropsWithChildren> = ({
   children,
 }) => {
   const [returnType, setReturnType] = useState<string>("success");
-  const [timeToCompletion, setTimeToCompletion] = useState<string>();
 
-  const testAsyncFunctionThatRequiresState_Unwrapped = async (
-    controller: AbortController,
-    timeToCompletion: string | undefined,
-    returnType: string | undefined
-  ) => {
-    assert(
-      returnType,
-      "returnType must be defined for testAsyncFunctionThatRequiresState"
-    );
-    assert(
-      timeToCompletion,
-      "timeToCompletion must be defined for testAsyncFunctionThatRequiresState"
-    );
-    return customMockRequest(controller, {
-      timeToComplete: {
-        value: timeToCompletion,
-      },
-      completionType: {
-        value: returnType,
-      },
-    });
-  };
-
-  const testAsyncFunctionThatRequiresState = elvis.useWrap_Abortable(
-    "testAsyncFunctionThatRequiresState",
-    testAsyncFunctionThatRequiresState_Unwrapped,
-    customFunctionConfig
+  const testFunction2 = useCallback(
+    (callback: (...args: any) => Promise<any>) => {
+      return () => console.log("testFunction2", callback(), returnType);
+    },
+    [returnType]
   );
   return (
     <TestContext.Provider
       value={{
-        testAsyncFunctionThatRequiresState,
         returnType,
-        timeToCompletion,
         setReturnType,
-        setTimeToCompletion,
+        testFunction2,
       }}
     >
       {children}

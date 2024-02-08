@@ -28,12 +28,6 @@ import { useAbortController } from "./useAbortController";
 import { ElvisContext } from "../components/contexts/ElvisContext";
 import { ElvisDisplayConfig } from "../config/types";
 
-const errorsForPromise = (promise: Promise<any>) => {
-  return promise
-    .then((data) => [data, undefined])
-    .catch((error) => Promise.resolve([undefined, error]));
-};
-
 export function useWrap_Abortable<T extends any[]>(
   name: string,
   callback: (controller: AbortController, ...args: T) => Promise<any>,
@@ -42,16 +36,52 @@ export function useWrap_Abortable<T extends any[]>(
   const abortController = useAbortController();
   const context = useContext(ElvisContext);
   return {
-    f: useCallback(
-      async (...args: T) => {
-        const r = await context.wrapAsyncFunction_Abortable(
-          { identifier: name, callback, config, abortController },
-          args
-        );
-        return r;
-      },
-      [context, abortController]
-    ),
+    f: async (...args: T) => {
+      const r = await context.wrapAsyncFunction_Abortable(
+        { identifier: name, callback, config, abortController },
+        args
+      );
+      return r;
+    },
     abortController,
   };
 }
+
+//! OLD VERSION, FOR REFERENCE
+// export function useWrap_Abortable<T extends any[]>(
+//   name: string,
+//   callback: (controller: AbortController, ...args: T) => Promise<any>,
+//   config: ElvisDisplayConfig
+// ) {
+//   const abortController = useAbortController();
+//   const context = useContext(ElvisContext);
+//   return {
+//     f: useCallback(
+//       async (...args: T) => {
+//         const r = await context.wrapAsyncFunction_Abortable(
+//           { identifier: name, callback, config, abortController },
+//           args
+//         );
+//         return r;
+//       },
+//       [context, abortController]
+//     ),
+//     abortController,
+//   };
+// }
+
+// export const useDELETE_ME_useWrapTest = useCallback(
+//   <T extends any[]>(
+//     callback: (controller: AbortController, ...args: T) => Promise<any>
+//   ) => {
+//     const abortController = useAbortController();
+//     const context = useContext(ElvisContext);
+//     return useCallback(
+//       async (...args: T) => {
+//         return callback(abortController, ...args);
+//       },
+//       [context, abortController]
+//     );
+//   },
+//   []
+// );
