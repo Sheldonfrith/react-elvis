@@ -25,7 +25,7 @@ https://github.com/Sheldonfrith/react-elvis
 */
 import React from "react";
 import { customMockRequest } from "../../lib/helpers/mockAsyncFunctions";
-import * as elvis from "react-elvis";
+import * as elvis from "../../react-elvis";
 import { customFunctionConfig } from "../../lib/config/messages";
 import TextInput from "./TextInputs";
 import SelectInput from "./SelectInput";

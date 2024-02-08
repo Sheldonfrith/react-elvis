@@ -25,7 +25,8 @@ https://github.com/Sheldonfrith/react-elvis
 */
 import React, { useState, useEffect, ReactNode } from "react";
 import { customMockRequest } from "../../lib/helpers/mockAsyncFunctions";
-import * as elvis from "react-elvis";
+import * as elvis from "../../react-elvis";
+
 import { UserFacingError, UserFacingLoading } from "../../lib/config/types";
 import { customFunctionConfig } from "../../lib/config/messages";
 import { assert } from "../../lib/helpers/myAssert";

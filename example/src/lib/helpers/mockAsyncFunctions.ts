@@ -24,7 +24,7 @@ For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
 const incorrectlyReturnsAnErrorAfterASpecifiedAmountOfTime_Cancellable = async (
-  signal: AbortController,
+  signal: AbortController | undefined,
   seconds: number
 ) => {
   //! NOTE you have to "reject" with the error within a promise otherwise our wrapper cannot catch the error as it has already passed...
@@ -43,7 +43,7 @@ const incorrectlyReturnsAnErrorAfterASpecifiedAmountOfTime_Cancellable = async (
 };
 
 const returnsAnErrorAfterASpecifiedAmountOfTime_Cancellable = async (
-  signal: AbortController,
+  signal: AbortController | undefined,
   seconds: number
 ) => {
   //! NOTE you have to "reject" with the error within a promise otherwise our wrapper cannot catch the error as it has already passed...
@@ -60,7 +60,7 @@ const returnsAnErrorAfterASpecifiedAmountOfTime_Cancellable = async (
 };
 
 const returnsDataAfterASpecifiedAmountOfTime_Cancellable = async (
-  signal: AbortController,
+  signal: AbortController | undefined,
   seconds: number
 ) => {
   return new Promise((resolve, reject) => {
@@ -75,7 +75,7 @@ const returnsDataAfterASpecifiedAmountOfTime_Cancellable = async (
   });
 };
 const cancelsItselfAfterASpecifiedAmountOfTime_Cancellable = async (
-  abortController: AbortController,
+  abortController: AbortController | undefined,
   seconds: number
 ) => {
   console.log(
@@ -83,11 +83,10 @@ const cancelsItselfAfterASpecifiedAmountOfTime_Cancellable = async (
     abortController
   );
   return new Promise((resolve, reject) => {
-    console.log("in promise", abortController.signal, abortController);
     abortableTimeout(
       abortController,
       async () => {
-        abortController.abort();
+        if (abortController) abortController.abort();
       },
       seconds * 1000,
       resolve
@@ -96,8 +95,10 @@ const cancelsItselfAfterASpecifiedAmountOfTime_Cancellable = async (
 };
 
 export function customMockRequest(
-  abortController: AbortController,
-  formValues: EventTarget
+  abortController: AbortController | undefined,
+  formValues:
+    | EventTarget
+    | { timeToComplete: { value: string }; completionType: { value: string } }
 ) {
   // wait for the validation process to complete
   const { timeToComplete, completionType } =
@@ -125,7 +126,11 @@ export function customMockRequest(
       );
   }
 }
-export function validateMockRequestInput(formValues: EventTarget): {
+export function validateMockRequestInput(
+  formValues:
+    | EventTarget
+    | { timeToComplete: { value: string }; completionType: { value: string } }
+): {
   timeToComplete: number;
   completionType:
     | "success"
@@ -166,19 +171,20 @@ export function validateMockRequestInput(formValues: EventTarget): {
 }
 
 function abortableTimeout(
-  controller: AbortController,
+  controller: AbortController | undefined,
   callback: (...args: any) => Promise<any>,
   ms: number,
   resolve: (value: any) => void
 ) {
-  console.log("in abortableTimeout", controller.signal);
   const timeout = setTimeout(callback, ms);
-  controller.signal.addEventListener(
-    "abort",
-    () => {
-      clearTimeout(timeout);
-      resolve("Operation aborted");
-    },
-    { once: true }
-  );
+  if (controller) {
+    controller.signal.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timeout);
+        resolve("Operation aborted");
+      },
+      { once: true }
+    );
+  }
 }

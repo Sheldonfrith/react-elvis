@@ -34,11 +34,13 @@ import React, {
 interface TextInputProps {
   classNameOverride?: string;
   onChangeOverride?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  valueOverride?: string;
   children?: React.ReactNode;
 }
 const TextInput: React.FunctionComponent<TextInputProps> = ({
   classNameOverride,
   onChangeOverride,
+  valueOverride,
   children,
 }) => {
   return (
@@ -53,6 +55,7 @@ const TextInput: React.FunctionComponent<TextInputProps> = ({
             "border border-black p-2 w-56 rounded-md text-black"
           }
           onChange={onChangeOverride}
+          value={valueOverride}
           id="timeToComplete"
           name="timeToComplete"
           type="text"

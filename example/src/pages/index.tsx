@@ -26,7 +26,6 @@ https://github.com/Sheldonfrith/react-elvis
 import ExampleForm_NoFeedbackDisplay from "../components/example-forms/ExampleForm_NoFeedbackDisplay";
 import ExampleForm_FeedbackAtBottomOnly from "../components/example-forms/ExampleForm_FeedbackAtBottomOnly";
 import ExampleForm_IntegratedFeedback from "../components/example-forms/ExampleForm_IntegratedFeedback";
-import { ElvisDefault } from "react-elvis";
 export default function Home() {
   return (
     <main
@@ -45,7 +44,7 @@ export default function Home() {
         💡 Type something non-numeric to see how input errors can be
         displayed...
       </i>
-      <ElvisDefault />
+      {/* <ElvisDefault /> */}
       <h2 className={`text-2xl font-bold text-center`}>
         {" "}
         Feedback via Popup 📰

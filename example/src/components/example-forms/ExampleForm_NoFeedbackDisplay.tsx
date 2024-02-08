@@ -23,13 +23,15 @@ SOFTWARE.
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
-import React from "react";
+import React, { useContext } from "react";
 import { customMockRequest } from "../../lib/helpers/mockAsyncFunctions";
-import * as elvis from "react-elvis";
+import * as elvis from "../../react-elvis";
+
 import { customFunctionConfig } from "../../lib/config/messages";
 import TextInput from "./TextInputs";
 import SelectInput from "./SelectInput";
 import { primaryButton } from "../../styles/tailwindHelpers";
+import { TestContext } from "../TestContext";
 
 interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
   formId: string;
@@ -37,17 +39,14 @@ interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
 const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
   ExampleForm_FeedbackAtBottomOnlyDisplayProps
 > = ({ formId }) => {
-  const { f: definedFunction, abortController: _ } = elvis.useWrap_Abortable(
-    "customFunction_" + formId,
-    (controller: AbortController, v: EventTarget) =>
-      customMockRequest(controller, v),
-    customFunctionConfig
-  );
+  const context = useContext(TestContext);
+  const { f: definedFunction, abortController: _ } =
+    context.testAsyncFunctionThatRequiresState;
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formValues = event.target;
-    console.log("Form Values", formValues);
-    definedFunction(formValues);
+    console.log("context.timeToCompletion", context.timeToCompletion);
+    console.log("context.returnType", context.returnType);
+    definedFunction(context.timeToCompletion, context.returnType);
   }
 
   return (
@@ -55,8 +54,18 @@ const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
       className="border border-white p-4 flex flex-col w-full rounded-md bg-gray-900 m-4 mb-8"
       onSubmit={handleSubmit}
     >
-      <SelectInput />
-      <TextInput />
+      <SelectInput
+        onChangeOverride={(e) => {
+          context.setReturnType(e.target.value);
+        }}
+        valueOverride={context.returnType}
+      />
+      <TextInput
+        onChangeOverride={(e) => {
+          context.setTimeToCompletion(e.target.value);
+        }}
+        valueOverride={context.timeToCompletion}
+      />
 
       <div className="flex flex-row">
         <button type="submit" className={primaryButton}>

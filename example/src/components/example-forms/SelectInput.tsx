@@ -30,17 +30,21 @@ import React, {
   useCallback,
   useRef,
 } from "react";
+import { TestContext } from "../TestContext";
 
 interface SelectInputProps {
   classNameOverride?: string;
   onChangeOverride?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  valueOverride?: string;
   children?: React.ReactNode;
 }
 const SelectInput: React.FunctionComponent<SelectInputProps> = ({
   classNameOverride,
   onChangeOverride,
+  valueOverride,
   children,
 }) => {
+  const context = useContext(TestContext);
   return (
     <div className="flex flex-row w-full mb-2">
       <label className=" p-2 pr-16 rounded-md text-white w-16 mr-14 whitespace-nowrap text-lg">
@@ -53,6 +57,7 @@ const SelectInput: React.FunctionComponent<SelectInputProps> = ({
         }
         id="completionType"
         name="completionType"
+        value={valueOverride}
         onChange={onChangeOverride}
       >
         <option value="success">Success</option>

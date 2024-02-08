@@ -12,7 +12,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c --bundleConfigAsCjs",
-    "start": "rollup -c -w"
+    "start": "rollup -c -w --bundleConfigAsCjs"
   },
   "repository": {
     "type": "git",
