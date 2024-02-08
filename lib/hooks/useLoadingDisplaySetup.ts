@@ -66,7 +66,6 @@ export function useLoadingDisplaySetup(
 
   const onLoadingStart = useCallback(
     (loading: UserFacingLoading, abortController?: AbortController) => {
-      console.log("on loading start");
       setLoadingState(loading);
       if (abortController) {
         setAbortController(abortController);
@@ -78,7 +77,6 @@ export function useLoadingDisplaySetup(
   const onLoadingEnd = useCallback(
     (success: UserFacingSuccess) => {
       setLoadingState(undefined);
-      console.log("about to set success state");
       setSuccessState(success);
       additionalEffects?.onLoadingEnd.forEach((f) => f());
     },

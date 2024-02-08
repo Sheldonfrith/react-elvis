@@ -33,18 +33,14 @@ export function useWrap<T extends any[]>(
   config: ElvisDisplayConfig
 ) {
   const context = useContext(ElvisContext);
-
-  return useCallback(
-    (...args: Parameters<typeof callback>) => {
-      return context.wrapAsyncFunction(
-        {
-          identifier: name,
-          callback,
-          config,
-        },
-        args
-      );
-    },
-    [context]
-  );
+  return (...args: Parameters<typeof callback>) => {
+    return context.wrapAsyncFunction(
+      {
+        identifier: name,
+        callback,
+        config,
+      },
+      args
+    );
+  };
 }

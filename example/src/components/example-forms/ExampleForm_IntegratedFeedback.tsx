@@ -25,7 +25,7 @@ https://github.com/Sheldonfrith/react-elvis
 */
 import React, { useState, useEffect, ReactNode } from "react";
 import { customMockRequest } from "../../lib/helpers/mockAsyncFunctions";
-import * as elvis from "../../react-elvis";
+import * as elvis from "react-elvis";
 
 import { UserFacingError, UserFacingLoading } from "../../lib/config/types";
 import { customFunctionConfig } from "../../lib/config/messages";
@@ -66,9 +66,7 @@ const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
   );
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formValues = event.target;
-    console.log("Form Values", formValues);
-    definedFunction(formValues);
+    definedFunction(event.target);
   }
   const { error, clearError, residualError } = elvis.useHandleErrorDisplay(
     "customFunction_" + formId

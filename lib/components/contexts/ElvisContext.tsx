@@ -47,6 +47,7 @@ import {
   DefaultUserFacingSuccess,
   unhandledPromiseRejectionError,
 } from "../../config/messages";
+import { useAbortController } from "../../hooks/useAbortController";
 
 //initialize state structure here
 export const ElvisContext = React.createContext({
@@ -126,7 +127,6 @@ export const ElvisProvider: React.FunctionComponent<
   //! EVENT HANDLERS //
   const loadingStart = useCallback(
     (query: UserFacingAsyncFunction<any>) => {
-      console.log("loadingStart", query.identifier);
       const d = findLoadingDisplayer(query);
       d.onLoadingStart(
         query.config.loading || DefaultUserFacingLoading,
@@ -142,7 +142,6 @@ export const ElvisProvider: React.FunctionComponent<
   );
   const loadingCancel = useCallback(
     (query: UserFacingAsyncFunction<any>) => {
-      console.log("loadingCancel", query.identifier);
       const d = findLoadingDisplayer(query);
       d.onLoadingCancel(query.config.cancelled || DefaultUserFacingCancelled);
     },
@@ -150,7 +149,6 @@ export const ElvisProvider: React.FunctionComponent<
   );
   const loadingEnd = useCallback(
     (query: UserFacingAsyncFunction<any>) => {
-      console.log("loadingEnd", query.identifier);
       const d = findLoadingDisplayer(query);
       d.onLoadingEnd(query.config.success || DefaultUserFacingSuccess);
     },
@@ -222,7 +220,6 @@ export const ElvisProvider: React.FunctionComponent<
   // handle the uncatchable errors
   useEffect(() => {
     if (pendingUncatchableErrors.length > 0) {
-      console.log("handling uncatchable error", pendingUncatchableErrors);
       const error = pendingUncatchableErrors[0];
       errorDetected(error.query, error.error);
       setPendingUncatchableErrors((prev) => {
@@ -231,22 +228,31 @@ export const ElvisProvider: React.FunctionComponent<
     }
   }, [pendingUncatchableErrors, errorDetected]);
 
+  //!TODO MOVE THIS
+  const catchPromiseErrors = (promise: Promise<any>) => {
+    return promise
+      .then((data) => [data, undefined])
+      .catch((error) => Promise.resolve([undefined, error]));
+  };
+
   //! CORE FUNCTIONALITY //
   const runAsyncFunctionWithEventHandlers = useCallback(
     async <ArgsType extends any[]>(
       query: UserFacingAsyncFunction<any>,
       args: ArgsType
     ) => {
-      console.log("runAsyncFunctionWithEventHandlers", query.identifier);
       try {
         // Set loading to true while the request is in progress
         loadingStart(query);
-        const result = await query.callback(...args);
+        const [result, error] = await catchPromiseErrors(
+          query.callback(...args)
+        );
+        if (error) {
+          throw error;
+        }
         loadingEnd(query);
-        console.log("SUCCESSFULLY RAN THE CALLBACK");
         return result;
       } catch (error) {
-        console.log("caught error in runAsyncFunctionWithEventHandlers", error);
         loadingEnd(query);
         errorDetected(query, error);
       }
@@ -270,7 +276,6 @@ export const ElvisProvider: React.FunctionComponent<
         "You are probably cancelling and retrying too fast. Your abort signal is already aborted, possibly from a previous cancellation that hasnt reset yet."
       );
     }
-    console.log("registering async function");
     function abortEventListener() {
       loadingCancel(query);
     }
@@ -305,6 +310,7 @@ export const ElvisProvider: React.FunctionComponent<
   function registerDefaultLoadingDisplayer(c: LoadingDisplayer) {
     setDefaultLoadingDisplayer({ ...c });
   }
+
   return (
     <ElvisContext.Provider
       value={{

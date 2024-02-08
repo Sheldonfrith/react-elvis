@@ -25,14 +25,13 @@ https://github.com/Sheldonfrith/react-elvis
 */
 import React, { useContext } from "react";
 import { customMockRequest } from "../../lib/helpers/mockAsyncFunctions";
-import * as elvis from "../../react-elvis";
+import * as elvis from "react-elvis";
 
 import { customFunctionConfig } from "../../lib/config/messages";
 import TextInput from "./TextInputs";
 import SelectInput from "./SelectInput";
 import { primaryButton } from "../../styles/tailwindHelpers";
 import { TestContext } from "../TestContext";
-import { Test2Context } from "../Test2Context";
 
 interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
   formId: string;
@@ -41,19 +40,16 @@ const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
   ExampleForm_FeedbackAtBottomOnlyDisplayProps
 > = ({ formId }) => {
   const context = useContext(TestContext);
-  const context2 = useContext(Test2Context);
 
-  const { f: FUNC, abortController } = elvis.useWrap_Abortable(
-    "test1",
-    context2.testAsyncFunctionThatRequiresState_Unwrapped,
+  const { f: definedFunction, abortController } = elvis.useWrap_Abortable(
+    "customFunction_" + formId,
+    context.testAsyncFunctionThatRequiresState_Unwrapped,
     customFunctionConfig
   );
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    console.log("context.timeToCompletion", context2.timeToCompletion);
-    console.log("context.returnType", context.returnType);
-    FUNC();
+    definedFunction();
   }
 
   return (
@@ -69,9 +65,9 @@ const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
       />
       <TextInput
         onChangeOverride={(e) => {
-          context2.setTimeToCompletion(e.target.value);
+          context.setTimeToCompletion(e.target.value);
         }}
-        valueOverride={context2.timeToCompletion}
+        valueOverride={context.timeToCompletion}
       />
 
       <div className="flex flex-row">

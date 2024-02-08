@@ -63,7 +63,6 @@ export function errorDetected_Internals(
     query: UserFacingAsyncFunction<any>
   ) => LoadingDisplayer
 ) {
-  console.log("errorDetected", query.identifier, error);
   const ds = findErrorDisplayers(query, error);
   ds.forEach((d) => {
     const definedError = query.config.definedErrors?.find((f) => f(error));

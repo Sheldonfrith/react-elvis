@@ -8,7 +8,7 @@ import React, {
 import { customMockRequest } from "../lib/helpers/mockAsyncFunctions";
 import { assert } from "../lib/helpers/myAssert";
 import { customFunctionConfig } from "../lib/config/messages";
-import * as elvis from "../react-elvis";
+import * as elvis from "react-elvis";
 
 //define types here
 
@@ -16,26 +16,50 @@ import * as elvis from "../react-elvis";
 export const TestContext = React.createContext({
   returnType: "2" as string | undefined,
   setReturnType: (v: string) => {},
-  testFunction2: (callback: (...args: any) => Promise<any>) => () => {},
+  timeToCompletion: "1" as string | undefined,
+  setTimeToCompletion: (v: string) => {},
+  testAsyncFunctionThatRequiresState_Unwrapped: async (
+    controller: AbortController
+  ) => {
+    return "1" as unknown;
+  },
 });
 
 const TestProvider: React.FunctionComponent<PropsWithChildren> = ({
   children,
 }) => {
   const [returnType, setReturnType] = useState<string>("success");
-
-  const testFunction2 = useCallback(
-    (callback: (...args: any) => Promise<any>) => {
-      return () => console.log("testFunction2", callback(), returnType);
+  const [timeToCompletion, setTimeToCompletion] = useState<string>();
+  const testAsyncFunctionThatRequiresState_Unwrapped = useCallback(
+    async (controller: AbortController) => {
+      assert(
+        returnType !== undefined,
+        "returnType must be defined for testAsyncFunctionThatRequiresState"
+      );
+      assert(
+        timeToCompletion !== undefined,
+        "timeToCompletion must be defined for testAsyncFunctionThatRequiresState"
+      );
+      return customMockRequest(controller, {
+        timeToComplete: {
+          value: timeToCompletion,
+        },
+        completionType: {
+          value: returnType,
+        },
+      });
     },
-    [returnType]
+    [returnType, timeToCompletion]
   );
+
   return (
     <TestContext.Provider
       value={{
         returnType,
         setReturnType,
-        testFunction2,
+        timeToCompletion,
+        setTimeToCompletion,
+        testAsyncFunctionThatRequiresState_Unwrapped,
       }}
     >
       {children}

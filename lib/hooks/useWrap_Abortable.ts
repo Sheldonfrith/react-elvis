@@ -36,16 +36,13 @@ export function useWrap_Abortable<T extends any[]>(
   const abortController = useAbortController();
   const context = useContext(ElvisContext);
   return {
-    f: useCallback(
-      (...args: T) => {
-        const r = context.wrapAsyncFunction_Abortable(
-          { identifier: name, callback, config, abortController },
-          args
-        );
-        return r;
-      },
-      [context, abortController]
-    ),
+    f: async (...args: T) => {
+      const r = await context.wrapAsyncFunction_Abortable(
+        { identifier: name, callback, config, abortController },
+        args
+      );
+      return r;
+    },
     abortController,
   };
 }
