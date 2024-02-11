@@ -23,23 +23,26 @@ SOFTWARE.
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
-import { useLoadingDisplaySetup } from "./useLoadingDisplaySetup";
+import { assert } from "../../../helpers/myAssert";
+import {
+  ErrorDisplayer,
+  UserFacingAsyncFunction,
+} from "../../../helpers/types";
 
-export function useHandleLoadingDisplay(
+export function findErrorDisplayers_Internals(
+  errorDisplayers: ErrorDisplayer[],
+  defaultErrorDisplayer: ErrorDisplayer | undefined,
   identifier: string,
-  durationOfCancelledState: number,
-  durationOfSuccessState: number,
-  additionalEffects?: {
-    onLoadingStart: (() => void)[];
-    onLoadingEnd: (() => void)[];
-    onLoadingCancel: (() => void)[];
-  }
+  error: unknown
 ) {
-  return useLoadingDisplaySetup(
-    "standard",
-    identifier,
-    durationOfCancelledState,
-    durationOfSuccessState,
-    additionalEffects
-  );
+  const displayers = errorDisplayers.filter((d) => d.id === identifier);
+  const displayersApplicable = displayers.filter((d) => {
+    return !d.onlyTheseErrors || d.onlyTheseErrors.some((f) => f(error));
+  });
+  if (displayersApplicable.length > 0) {
+    return displayersApplicable;
+  }
+  const d = defaultErrorDisplayer;
+  assert(d, `No default Error Displayer found.`);
+  return [d];
 }

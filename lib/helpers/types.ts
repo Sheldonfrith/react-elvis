@@ -56,7 +56,7 @@ export type UserFacingErrorFilter = (
 ) => UserFacingError | undefined;
 
 export type LoadingDisplayer = {
-  identifier: string;
+  id: string;
   onLoadingStart: (
     loading: UserFacingLoading,
     abortController?: AbortController
@@ -67,7 +67,7 @@ export type LoadingDisplayer = {
 };
 
 export type ErrorDisplayer = {
-  identifier: string;
+  id: string;
   onErrorDetected: (error: UserFacingError) => void;
   onNewFunctionCall: () => void;
   onlyTheseErrors?: ((error: unknown) => boolean)[];
@@ -81,10 +81,22 @@ export type ElvisDisplayConfig = {
   definedErrors?: UserFacingErrorFilter[];
 };
 
-export type UserFacingAsyncFunction<ArgsType extends any[]> = {
-  identifier: string;
-  callback: (...args: ArgsType) => Promise<any>;
+export type UserFacingAsyncFunction<
+  ArgsType extends any[] = any,
+  ReturnType = any
+> = {
+  id: string;
+  versionTimestamp: number;
+  callback: (...args: ArgsType) => Promise<ReturnType>;
   config: ElvisDisplayConfig;
-  abortController?: AbortController;
-  resetAbortController?: () => void;
+  abortable: "abortable" | "not-abortable";
+};
+
+export type FunctionExecutionRequest = {
+  calledAt: number;
+  id: string;
+  versionTimestamp: number;
+  args: any[];
+  resolve: (value: unknown) => void;
+  reject: (reason: any) => void;
 };

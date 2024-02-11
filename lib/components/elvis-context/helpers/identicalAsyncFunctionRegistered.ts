@@ -23,26 +23,26 @@ SOFTWARE.
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
-import { useContext, useCallback } from "react";
-import { useAbortController } from "./useAbortController";
-import { ElvisContext } from "../components/contexts/ElvisContext";
-import { ElvisDisplayConfig } from "../config/types";
+import {
+  ElvisDisplayConfig,
+  UserFacingAsyncFunction,
+} from "../../../helpers/types";
 
-export function useWrap_Abortable<T extends any[]>(
-  name: string,
-  callback: (controller: AbortController, ...args: T) => Promise<any>,
-  config: ElvisDisplayConfig
+export function identicalAsyncFunctionRegistered(
+  identifier: string,
+  f: (...args: any) => Promise<any>,
+  config: ElvisDisplayConfig | undefined,
+  abortable: "abortable" | "not-abortable",
+  registeredFunctions: Record<string, UserFacingAsyncFunction<any>>
 ) {
-  const abortController = useAbortController();
-  const context = useContext(ElvisContext);
-  return {
-    f: async (...args: T) => {
-      const r = await context.wrapAsyncFunction_Abortable(
-        { identifier: name, callback, config, abortController },
-        args
-      );
-      return r;
-    },
-    abortController,
-  };
+  const match = registeredFunctions[identifier];
+  const somethingExists = !!match;
+  if (!somethingExists) {
+    return;
+  }
+  const callbackSame = match.callback === f;
+  const abortableSame = match.abortable === abortable;
+  const configSame =
+    !!match.config || !!config ? match.config === config : true;
+  return somethingExists && callbackSame && abortableSame && configSame;
 }

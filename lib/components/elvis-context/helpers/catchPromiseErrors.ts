@@ -23,22 +23,12 @@ SOFTWARE.
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
-import { useLoadingDisplaySetup } from "./useLoadingDisplaySetup";
-
-export function useRegisterDefaultLoadingDisplay(
-  durationOfCancelledState: number,
-  durationOfSuccessState: number,
-  additionalEffects?: {
-    onLoadingStart: (() => void)[];
-    onLoadingEnd: (() => void)[];
-    onLoadingCancel: (() => void)[];
-  }
-) {
-  return useLoadingDisplaySetup(
-    "default",
-    "",
-    durationOfCancelledState,
-    durationOfSuccessState,
-    additionalEffects
-  );
-}
+export const catchPromiseErrors = <T>(
+  promise: Promise<T>
+): Promise<[T | undefined, unknown | undefined]> => {
+  return promise
+    .then<[T | undefined, unknown | undefined]>((data) => [data, undefined])
+    .catch<[T | undefined, unknown | undefined]>((error) =>
+      Promise.resolve([undefined, error])
+    );
+};

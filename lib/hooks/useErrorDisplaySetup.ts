@@ -24,13 +24,15 @@ For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
 import { useState, useEffect, useContext } from "react";
-import { UserFacingError } from "../config/types";
-import { ElvisContext } from "../components/contexts/ElvisContext";
+import { ErrorDisplayer, UserFacingError } from "../helpers/types";
+import { ElvisContext } from "../components/elvis-context/ElvisContext";
 
 export function useErrorDisplaySetup(
-  type: "default" | "standard",
-  identifier: string
+  identifier: string,
+  registerFunction: (c: ErrorDisplayer) => void
 ) {
+  const context = useContext(ElvisContext);
+
   const [errorState, setErrorState] = useState<UserFacingError>();
   // this captures the current or previous error state, and is erased as soon as the same function is called again
   const [residualErrorState, setResidualErrorState] =
@@ -42,17 +44,12 @@ export function useErrorDisplaySetup(
     }
   }, [errorState]);
 
-  const context = useContext(ElvisContext);
   useEffect(() => {
-    if (!context.registerErrorDisplayer) {
+    if (!context) {
       throw new Error("ElvisContext not loaded");
     }
-    const registerFunction =
-      type === "default"
-        ? context.registerDefaultErrorDisplayer
-        : context.registerErrorDisplayer;
     registerFunction({
-      identifier: identifier,
+      id: identifier,
       onErrorDetected: (error: UserFacingError) => {
         setErrorState(error);
       },

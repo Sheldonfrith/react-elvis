@@ -27,9 +27,7 @@ import React, { ReactNode, useCallback, useEffect, useState } from "react";
 
 import CustomizableButton from "./CustomizableButton";
 import LoadingSpinner from "./LoadingSpinner";
-import { useRegisterDefaultErrorDisplay } from "../../hooks/useRegisterDefaultErrorDisplay";
-import { useRegisterDefaultLoadingDisplay } from "../../hooks/useRegisterDefaultLoadingDisplay";
-
+import { useElvis } from "../../hooks/useElvis";
 const defaultProps: ElvisDefaultProps = {
   cancelledStatusDuration_ms: 500,
   successStatusDuration_ms: 500,
@@ -97,9 +95,10 @@ export const ElvisDefault: React.FC<OptionalElvisDefaultProps> = (props) => {
   p.text = { ...p.text, ...props.text };
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { error, clearError, residualError } = useRegisterDefaultErrorDisplay();
+  const elvis = useElvis();
+  const { error, clearError, residualError } = elvis.display.error.default();
   const { loading, cancelled, success, abortController } =
-    useRegisterDefaultLoadingDisplay(
+    elvis.display.loading.default(
       p.cancelledStatusDuration_ms,
       p.successStatusDuration_ms
     );

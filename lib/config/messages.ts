@@ -29,7 +29,7 @@ import {
   UserFacingError,
   UserFacingLoading,
   UserFacingSuccess,
-} from "./types";
+} from "../helpers/types";
 
 export const customFunctionConfig: ElvisDisplayConfig = {
   defaultError: {

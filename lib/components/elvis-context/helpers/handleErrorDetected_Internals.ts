@@ -23,24 +23,35 @@ SOFTWARE.
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
-import { useContext, useCallback } from "react";
-import { ElvisContext } from "../components/contexts/ElvisContext";
-import { ElvisDisplayConfig } from "../config/types";
+import { DefaultUserFacingError } from "../../../config/messages";
+import {
+  UserFacingAsyncFunction,
+  ErrorDisplayer,
+  LoadingDisplayer,
+} from "../../../helpers/types";
 
-export function useWrap<T extends any[]>(
-  name: string,
-  callback: (...args: T) => Promise<any>,
-  config: ElvisDisplayConfig
+export function handleErrorDetected_Internals(
+  id: string,
+  error: unknown,
+  registeredFunctions: Record<string, UserFacingAsyncFunction<any>>,
+  findErrorDisplayers: (id: string, error: unknown) => ErrorDisplayer[],
+  findLoadingDisplayer: (id: string) => LoadingDisplayer
 ) {
-  const context = useContext(ElvisContext);
-  return (...args: Parameters<typeof callback>) => {
-    return context.wrapAsyncFunction(
-      {
-        identifier: name,
-        callback,
-        config,
-      },
-      args
+  const f = registeredFunctions[id];
+  if (!f) {
+    throw new Error(
+      `Could not find a registered async function with the given identifier ${id}. Ensure you wait for all function executions to complete before removing a registered async function.`
     );
-  };
+  }
+  const ds = findErrorDisplayers(id, error);
+  ds.forEach((d) => {
+    const definedError = f.config.definedErrors?.find((f) => f(error));
+    if (definedError) {
+      d.onErrorDetected(definedError(error)!);
+    } else {
+      d.onErrorDetected(f.config.defaultError || DefaultUserFacingError);
+    }
+  });
+  const ld = findLoadingDisplayer(id);
+  ld.onErrorDetected();
 }

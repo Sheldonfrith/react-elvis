@@ -23,14 +23,7 @@ SOFTWARE.
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
-export { useWrap } from "./hooks/useWrap";
-export { useWrap_Abortable } from "./hooks/useWrap_Abortable";
-export { useHandleErrorDisplay } from "./hooks/useHandleErrorDisplay";
-export { useRegisterDefaultErrorDisplay } from "./hooks/useRegisterDefaultErrorDisplay";
-export { useHandleLoadingDisplay } from "./hooks/useHandleLoadingDisplay";
-export { useRegisterDefaultLoadingDisplay } from "./hooks/useRegisterDefaultLoadingDisplay";
-export {
-  ElvisContext,
-  ElvisProvider,
-} from "./components/contexts/ElvisContext";
+export { ElvisProvider } from "./components/elvis-context/ElvisProvider";
+export { ElvisContext } from "./components/elvis-context/ElvisContext";
+export { useElvis } from "./hooks/useElvis";
 export { ElvisDefault } from "./components/elvis-default/ElvisDefault";

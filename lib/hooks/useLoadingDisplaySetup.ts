@@ -24,23 +24,19 @@ For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
 import { useState, useEffect, useContext, useCallback } from "react";
-import { ElvisContext } from "../components/contexts/ElvisContext";
 import {
   UserFacingLoading,
   UserFacingCancelled,
   UserFacingSuccess,
-} from "../config/types";
+  LoadingDisplayer,
+} from "../helpers/types";
+import { ElvisContext } from "../components/elvis-context/ElvisContext";
 
 export function useLoadingDisplaySetup(
-  type: "default" | "standard",
   identifier: string,
+  registerFunction: (c: LoadingDisplayer) => void,
   durationOfCancelledState: number,
-  durationOfSuccessState: number,
-  additionalEffects?: {
-    onLoadingStart: (() => void)[];
-    onLoadingEnd: (() => void)[];
-    onLoadingCancel: (() => void)[];
-  }
+  durationOfSuccessState: number
 ) {
   const context = useContext(ElvisContext);
   const [loadingState, setLoadingState] = useState<UserFacingLoading>();
@@ -70,7 +66,6 @@ export function useLoadingDisplaySetup(
       if (abortController) {
         setAbortController(abortController);
       }
-      additionalEffects?.onLoadingStart.forEach((f) => f());
     },
     [setLoadingState, setAbortController]
   );
@@ -78,7 +73,6 @@ export function useLoadingDisplaySetup(
     (success: UserFacingSuccess) => {
       setLoadingState(undefined);
       setSuccessState(success);
-      additionalEffects?.onLoadingEnd.forEach((f) => f());
     },
     [setLoadingState, setSuccessState]
   );
@@ -86,7 +80,6 @@ export function useLoadingDisplaySetup(
     (cancelled: UserFacingCancelled) => {
       setLoadingState(undefined);
       setCancelledState(cancelled);
-      additionalEffects?.onLoadingCancel.forEach((f) => f());
     },
     [setLoadingState, setCancelledState]
   );
@@ -96,15 +89,8 @@ export function useLoadingDisplaySetup(
   }, [setCancelledState, setSuccessState]);
 
   useEffect(() => {
-    if (!context.registerLoadingDisplayer) {
-      throw new Error("ElvisContext not loaded");
-    }
-    const registerFunction =
-      type === "default"
-        ? context.registerDefaultLoadingDisplayer
-        : context.registerLoadingDisplayer;
     registerFunction({
-      identifier: identifier,
+      id: identifier,
       onLoadingStart,
       onLoadingEnd,
       onLoadingCancel,

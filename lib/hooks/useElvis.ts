@@ -23,8 +23,10 @@ SOFTWARE.
 For more information and to contribute to this project, visit:
 https://github.com/Sheldonfrith/react-elvis
 */
-import { useErrorDisplaySetup } from "./useErrorDisplaySetup";
 
-export function useRegisterDefaultErrorDisplay() {
-  return useErrorDisplaySetup("default", "");
+import { useContext } from "react";
+import { ElvisContext } from "../components/elvis-context/ElvisContext";
+
+export function useElvis() {
+  return useContext(ElvisContext);
 }
