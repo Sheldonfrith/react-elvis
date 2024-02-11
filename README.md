@@ -56,28 +56,31 @@ export default function SomeComponent(){
 ## 3. Wrap any Async Function
 
 ```TSX
-import * as elvis from "react-elvis";
+import {useElvis} from "react-elvis";
 
 async function AnyAsyncFunction (anyArgs){
     // do anything
 }
 
 export default function AnyComponent(){
-    const MyFunctionName = elvis.useWrap("MyFunctionName", AnyAsyncFunction )
+    const elvis = useElvis();
+    const myFunctionName = elvis.async.register("MyFunctionName", AnyAsyncFunction ,{})
     ....
 }
 ```
 **OR, If you want to make it cancellable (ie. have access to the `AbortController`):**
 ```TSX
-import * as elvis from "react-elvis";
+import {useElvis} from "react-elvis";
 
 // abortController argument must come first
-async function AnyCancellableAsyncFunction (abortController, anyOtherArgs){
+async function AnyCancellableAsyncFunction (abortController, ...anyOtherArgs){
     // do anything
 }
 
 export default function AnyComponent(){
-    const { f: MyFunctionName, abortController } = elvis.useWrap_Abortable("MyFunctionName", AnyCancellableAsyncFunction);
+    const elvis = useElvis();
+    const myFunctionName = elvis.async.abortable.register("MyFunctionName", AnyCancellableAsyncFunction,{});
+    const myFunctionAbortController = elvis.async.abortable.getAbortController("MyFunctionName");
     ....
 }
 ```
@@ -126,17 +129,17 @@ export type ElvisConfig = {
 #### Basic Usage (See the "example" app for details and advanced usage):
 
 ```TSX
-import * as elvis from 'react-elvis';
+import {useElvis} from 'react-elvis';
 
 
 export function SomeReactComponent(){
 ....
 
-
-  const { error, clearError, residualError } = elvis.useHandleErrorDisplay("MyFunctionName");
+  const elvis = useElvis();
+  const { error, clearError, residualError } = elvis.display.error.handle("MyFunctionName");
   const timeToDisplayCancelledState = 500;
   const timeToDisplaySuccessState = 500;
-  const { loading, cancelled, success, abortController } = elvis.useHandleLoadingDisplay("MyFunctionName", timeToDisplayCancelledState, timeToDisplaySuccessState);
+  const { loading, cancelled, success } = elvis.display.loading.handle("MyFunctionName", timeToDisplayCancelledState, timeToDisplaySuccessState);
 
   if (loading){
       return <p>{loading.title}</p>
@@ -154,26 +157,35 @@ export function SomeReactComponent(){
 
 ```TSX
 ...
-  const { error, clearError, residualError } = elvis.useRegisterDefaultErrorDisplay();
-  const { loading, cancelled, success, abortController } =
-    elvis.useRegisterDefaultLoadingDisplay(timeToDisplayCancelledState, timeToDisplaySuccessState);
+  const { error, clearError, residualError } = elvis.display.error.default();
+  const { loading, cancelled, success } =
+    elvis.display.loading.default(timeToDisplayCancelledState, timeToDisplaySuccessState);
 ...
 ```
 
 ### 3. Customize Displays for an Async Function
 
 ```TSX
-import * as elvis from "react-elvis";
+import {useElvis} from "react-elvis";
 
 async function AnyAsyncFunction (anyArgs){
     // do anything
 }
 
 export default function AnyComponent(){
+    const elvis = useElvis();
     const MyFunctionName = elvis.useWrap("MyFunctionName", AnyAsyncFunction, {
         loading: {
             "title": "Loading MyFunctionName",
             "message": "... whatever you want to say to the user ..."
+        },
+        cancelled: {
+            "title": "MyFunctionName was cancelled.",
+            "message": "..."
+        },
+        success: {
+            "title": "MyFunctionName completed successfully.",
+            "message": "Hurray!"
         },
         definedErrors: [
             (error)=> {
@@ -188,10 +200,16 @@ export default function AnyComponent(){
         ]
     } )
     return (
+        <>
         <button
         onClick={MyFunctionName}>
         Try MyFunctionName
         </button>
+        <button
+        onClick={()=>elvis.async.abortable.getAbortController("MyFunctionName")?.abort()}>
+        Cancel
+        </button>
+        </>
     );
 }
 ```
@@ -200,12 +218,12 @@ export default function AnyComponent(){
 
 ```TSX
 
-export type ElvisDisplayConfig = {
-  defaultError?: UserFacingError;
-  loading?: UserFacingLoading;
-  success?: UserFacingSuccess;
-  cancelled?: UserFacingCancelled;
-  definedErrors?: UserFacingErrorFilter[];
+export type ElvisConfig = {
+  graceTimeToDetectDefaultDisplayers?: number; //1000
+  // in milliseconds, use if your default display component might take longer than usual to render
+  disableDefaultErrorDisplayerCheck?: boolean; // false
+  disableDefaultLoadingDisplayerCheck?: boolean; // false
+  // not recommended, React-Elvis will throw errors if it cannot find a way to display a loading or error state
 };
 
 export type UserFacingError = {
@@ -230,4 +248,31 @@ export type UserFacingCancelled = {
 export type UserFacingErrorFilter = (
   error: unknown
 ) => UserFacingError | undefined;
+
+export type LoadingDisplayer = {
+  id: string;
+  onLoadingStart: (
+    loading: UserFacingLoading,
+    abortController?: AbortController
+  ) => void;
+  onLoadingCancel: (cancelled: UserFacingCancelled) => void;
+  onLoadingEnd: (success: UserFacingSuccess) => void;
+  onErrorDetected: () => void;
+};
+
+export type ErrorDisplayer = {
+  id: string;
+  onErrorDetected: (error: UserFacingError) => void;
+  onNewFunctionCall: () => void;
+  onlyTheseErrors?: ((error: unknown) => boolean)[];
+};
+
+export type ElvisDisplayConfig = {
+  defaultError?: UserFacingError;
+  loading?: UserFacingLoading;
+  success?: UserFacingSuccess;
+  cancelled?: UserFacingCancelled;
+  definedErrors?: UserFacingErrorFilter[];
+};
+
 ```
