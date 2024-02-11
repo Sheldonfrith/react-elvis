@@ -127,7 +127,7 @@ export const ElvisDefault: React.FC<OptionalElvisDefaultProps> = (props) => {
       return cancelled.title;
     }
     return success?.title;
-  }, [error, loading]);
+  }, [error, loading, cancelled, success]);
   const getBody = useCallback(() => {
     if (error) {
       return error.message;
@@ -155,7 +155,7 @@ export const ElvisDefault: React.FC<OptionalElvisDefaultProps> = (props) => {
       return cancelled.message;
     }
     return success?.message;
-  }, [error, loading]);
+  }, [error, loading, cancelled, success]);
   const getActions = useCallback(() => {
     if (error) {
       return (
@@ -239,7 +239,7 @@ export const ElvisDefault: React.FC<OptionalElvisDefaultProps> = (props) => {
       );
     } else {
     }
-  }, [error, loading, abortController]);
+  }, [error, loading, cancelled, success, abortController]);
   if (!isOpen) {
     return null;
   }

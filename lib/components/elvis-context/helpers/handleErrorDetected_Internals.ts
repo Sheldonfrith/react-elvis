@@ -38,18 +38,13 @@ export function handleErrorDetected_Internals(
   findLoadingDisplayer: (id: string) => LoadingDisplayer
 ) {
   const f = registeredFunctions[id];
-  if (!f) {
-    throw new Error(
-      `Could not find a registered async function with the given identifier ${id}. Ensure you wait for all function executions to complete before removing a registered async function.`
-    );
-  }
   const ds = findErrorDisplayers(id, error);
   ds.forEach((d) => {
-    const definedError = f.config.definedErrors?.find((f) => f(error));
+    const definedError = f?.config.definedErrors?.find((f) => f(error));
     if (definedError) {
       d.onErrorDetected(definedError(error)!);
     } else {
-      d.onErrorDetected(f.config.defaultError || DefaultUserFacingError);
+      d.onErrorDetected(f?.config.defaultError || DefaultUserFacingError);
     }
   });
   const ld = findLoadingDisplayer(id);

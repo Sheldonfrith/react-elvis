@@ -30,7 +30,7 @@ import TextInput from "./TextInputs";
 import SelectInput from "./SelectInput";
 import { primaryButton } from "../../styles/tailwindHelpers";
 import { TestContext } from "../TestContext";
-import { useElvis } from "../../react-elvis";
+import { useElvis } from "react-elvis";
 
 interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
   formId: string;

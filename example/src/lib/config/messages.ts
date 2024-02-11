@@ -65,7 +65,6 @@ export const customFunctionConfig: ElvisDisplayConfig = {
           }
         }
       } catch (e) {
-        // console.log("error message is probably not json")
         return undefined;
       }
     },

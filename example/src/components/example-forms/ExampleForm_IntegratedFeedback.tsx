@@ -40,7 +40,7 @@ import {
 } from "../../styles/tailwindHelpers";
 import LoadingSpinner from "../LoadingSpinner";
 import { usePrevious } from "../../lib/usePrevious";
-import { useElvis } from "../../react-elvis";
+import { useElvis } from "react-elvis";
 
 interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
   formId: string;

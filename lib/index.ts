@@ -25,5 +25,5 @@ https://github.com/Sheldonfrith/react-elvis
 */
 export { ElvisProvider } from "./components/elvis-context/ElvisProvider";
 export { ElvisContext } from "./components/elvis-context/ElvisContext";
-export { useElvis } from "./hooks/useElvis";
 export { ElvisDefault } from "./components/elvis-default/ElvisDefault";
+export { useElvis } from "./hooks/useElvis";

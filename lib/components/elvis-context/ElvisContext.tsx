@@ -34,11 +34,12 @@ import {
 
 export const ElvisContext = React.createContext({
   async: {
+    wrappedFunctions: {} as Record<string, (...args: any[]) => Promise<any>>,
     register: <ArgsType extends any[], ReturnType>(
       identifier: string,
       f: (...args: ArgsType) => Promise<ReturnType>,
       config: ElvisDisplayConfig
-    ): ((...args: ArgsType) => Promise<ReturnType>) => {
+    ): ((...args: ArgsType) => Promise<ReturnType>) | undefined => {
       return (...args: any[]) => new Promise((resolve, reject) => {});
     },
     abortable: {
@@ -49,12 +50,12 @@ export const ElvisContext = React.createContext({
           ...args: ArgsType
         ) => Promise<ReturnType>,
         config: ElvisDisplayConfig
-      ): ((...args: ArgsType) => Promise<ReturnType>) => {
+      ): ((...args: ArgsType) => Promise<ReturnType>) | undefined => {
         return (...args: any[]) => new Promise((resolve, reject) => {});
       },
 
-      getAbortController: (identifier: string) => {
-        new AbortController();
+      getAbortController: (identifier: string): AbortController | undefined => {
+        return undefined;
       },
     },
   },
@@ -90,13 +91,11 @@ export const ElvisContext = React.createContext({
         loading: UserFacingLoading | undefined;
         cancelled: UserFacingCancelled | undefined;
         success: UserFacingSuccess | undefined;
-        abortController: AbortController | undefined;
       } => {
         return {
           loading: undefined,
           cancelled: undefined,
           success: undefined,
-          abortController: undefined,
         };
       },
       default: (

@@ -45,7 +45,6 @@ import {
   FunctionExecutionRequest,
 } from "../../helpers/types";
 import { assert } from "../../helpers/myAssert";
-import { resetableAbortController } from "../../hooks/useAbortController";
 
 import { useErrorDisplaySetup } from "../../hooks/useErrorDisplaySetup";
 import { useLoadingDisplaySetup } from "../../hooks/useLoadingDisplaySetup";
@@ -55,6 +54,9 @@ import { handleErrorDetected_Internals } from "./helpers/handleErrorDetected_Int
 import { processAsyncFunctionExecutionQueue } from "./helpers/processAsyncFunctionExecutionQueue";
 import { identicalAsyncFunctionRegistered } from "./helpers/identicalAsyncFunctionRegistered";
 import { catchPromiseErrors } from "./helpers/catchPromiseErrors";
+import { useRegisterAsyncFunction } from "../../hooks/useRegisterAsyncFunction";
+import { useRegisterAsyncFunctionAbortable } from "../../hooks/useRegisterAsyncFunctionAbortable";
+import { resetableAbortController } from "./helpers/resetableAbortController";
 
 export const ElvisProvider: React.FunctionComponent<
   PropsWithChildren<{ config?: ElvisConfig }>
@@ -77,13 +79,13 @@ export const ElvisProvider: React.FunctionComponent<
   const [abortControllers, setAbortControllers] = useState<
     Record<string, AbortController>
   >({});
-  const [abortControllerEventListeners, setAbortControllerEventListeners] =
-    useState<Record<string, EventListener>>({});
+
   const [wrappedFunctions, setWrappedFunctions] = useState<
     Record<string, (...args: any[]) => Promise<any>>
   >({});
   const [asyncFunctionExecutionQueue, setAsyncFunctionExecutionQueue] =
     useState<FunctionExecutionRequest[]>([]);
+  const [abortEventsQueue, setAbortEventsQueue] = useState<string[]>([]);
 
   // ! HELPER TO SETUP ABORT CONTROLLER ON NEW REGISTER REQUEST //
   const setupAbortControllerForNewAsyncFunction = useCallback(
@@ -96,7 +98,9 @@ export const ElvisProvider: React.FunctionComponent<
               return { ...prev, [id]: fresh };
             }),
           (e: Event) => {
-            handleLoadingCancel(id);
+            setAbortEventsQueue((prev) => {
+              return [...prev, id];
+            });
           }
         );
         return { ...prev, [id]: c };
@@ -104,6 +108,16 @@ export const ElvisProvider: React.FunctionComponent<
     },
     [setAbortControllers]
   );
+  useEffect(() => {
+    if (!abortEventsQueue.length) return;
+    setAbortEventsQueue((prev) => {
+      const s = new Set(prev);
+      s.forEach((id) => {
+        handleLoadingCancel(id);
+      });
+      return [];
+    });
+  }, [abortEventsQueue]);
 
   //! Handling function executions //
 
@@ -123,11 +137,17 @@ export const ElvisProvider: React.FunctionComponent<
     (id: string) => {
       const displayer = loadingDisplayers.find((d) => d.id === id);
       const d = displayer || defaultLoadingDisplayer;
-      assert(d, `No default Loading Displayer found.`);
+      assert(
+        d,
+        `No default Loading Displayer found. ${id} and ${JSON.stringify(
+          loadingDisplayers
+        )}`
+      );
       return d;
     },
     [loadingDisplayers, defaultLoadingDisplayer]
   );
+
   const findErrorDisplayers = useCallback(
     (id: string, error: unknown) => {
       return findErrorDisplayers_Internals(
@@ -168,7 +188,7 @@ export const ElvisProvider: React.FunctionComponent<
         d.onNewFunctionCall();
       });
     },
-    [findAllErrorDisplayers, findLoadingDisplayer]
+    [findAllErrorDisplayers, findLoadingDisplayer, registeredFunctions]
   );
   const handleLoadingCancel = useCallback(
     (id: string) => {
@@ -176,7 +196,7 @@ export const ElvisProvider: React.FunctionComponent<
       const f = registeredFunctions[id];
       d.onLoadingCancel(f?.config?.cancelled || DefaultUserFacingCancelled);
     },
-    [findLoadingDisplayer]
+    [findLoadingDisplayer, registeredFunctions]
   );
   const handleLoadingEnd = useCallback(
     (id: string) => {
@@ -184,7 +204,7 @@ export const ElvisProvider: React.FunctionComponent<
       const f = registeredFunctions[id];
       d.onLoadingEnd(f?.config?.success || DefaultUserFacingSuccess);
     },
-    [findLoadingDisplayer]
+    [findLoadingDisplayer, registeredFunctions]
   );
   const handleErrorDetected = useCallback(
     (id: string, error: unknown) => {
@@ -196,7 +216,7 @@ export const ElvisProvider: React.FunctionComponent<
         findLoadingDisplayer
       );
     },
-    [findLoadingDisplayer, findErrorDisplayers]
+    [findLoadingDisplayer, findErrorDisplayers, registeredFunctions]
   );
   //! DEFAULT DISPLAYERS CHECK //
   //wait for app to load, then check for default displayers
@@ -224,6 +244,11 @@ export const ElvisProvider: React.FunctionComponent<
   //! UNHANDLED PROMISE REJECTION HANDLER //
   // filter for when the user's code is missing promise rejection handlers
   useEffect(() => {
+    registerUnabortable(
+      "unhandledrejection",
+      async () => {},
+      unhandledPromiseRejectionError
+    );
     const unhandledRejectionHandler = (event: any) => {
       setPendingUncatchableErrors((prev) => {
         return [
@@ -319,7 +344,12 @@ export const ElvisProvider: React.FunctionComponent<
         handleErrorDetected(f.id, error);
       }
     },
-    [handleLoadingStart, handleLoadingEnd, handleErrorDetected]
+    [
+      handleLoadingStart,
+      handleLoadingEnd,
+      handleErrorDetected,
+      abortControllers,
+    ]
   );
 
   //! Display Registration Helpers ///
@@ -333,7 +363,7 @@ export const ElvisProvider: React.FunctionComponent<
     setDefaultLoadingDisplayer({ ...c });
   }
 
-  //! USER FACING FUNCTIONS //
+  //! NEW FUNCTION REGISTRATION FUNCTIONS //
 
   const registerUnabortable = useCallback(
     <ArgsType extends any[], ReturnType>(
@@ -342,23 +372,13 @@ export const ElvisProvider: React.FunctionComponent<
       config: ElvisDisplayConfig
     ): ((...args: ArgsType) => Promise<ReturnType>) => {
       const abortable = "not-abortable" as const;
-      if (
-        identicalAsyncFunctionRegistered(
-          id,
-          f,
-          config,
-          abortable,
-          registeredFunctions
-        )
-      ) {
-        return wrappedFunctions[id] as (
-          ...args: ArgsType
-        ) => Promise<ReturnType>;
-      }
-      const timestamp = Date.now();
-      const isNew = !registeredFunctions[id];
       setRegisteredFunctions((prev) => {
+        if (identicalAsyncFunctionRegistered(id, f, config, abortable, prev)) {
+          return prev;
+        }
+        const timestamp = Date.now();
         const p = prev[id];
+        const isNew = !p;
         const n = isNew
           ? {
               id,
@@ -374,24 +394,25 @@ export const ElvisProvider: React.FunctionComponent<
               abortable,
               config,
             };
+        setWrappedFunctions((prev) => {
+          return {
+            ...prev,
+            [id]: async (...args: any) => {
+              return await createFunctionExecutionRequestAndGetPromise(
+                id,
+                timestamp,
+                args
+              );
+            },
+          };
+        });
         return { ...prev, [id]: n };
-      });
-      setWrappedFunctions((prev) => {
-        return {
-          ...prev,
-          [id]: async (...args: any) => {
-            return await createFunctionExecutionRequestAndGetPromise(
-              id,
-              timestamp,
-              args
-            );
-          },
-        };
       });
       return wrappedFunctions[id] as (...args: ArgsType) => Promise<ReturnType>;
     },
     [registeredFunctions, abortControllers]
   );
+
   const registerAbortable = useCallback(
     <ArgsType extends any[], ReturnType>(
       id: string,
@@ -402,26 +423,13 @@ export const ElvisProvider: React.FunctionComponent<
       config: ElvisDisplayConfig
     ): ((...args: ArgsType) => Promise<ReturnType>) => {
       const abortable = "abortable" as const;
-      if (
-        identicalAsyncFunctionRegistered(
-          id,
-          f,
-          config,
-          abortable,
-          registeredFunctions
-        )
-      ) {
-        return wrappedFunctions[id] as (
-          ...args: ArgsType
-        ) => Promise<ReturnType>;
-      }
-      const timestamp = Date.now();
-      const isNew = !registeredFunctions[id];
-      if (isNew) {
-        setupAbortControllerForNewAsyncFunction(id);
-      }
       setRegisteredFunctions((prev) => {
+        if (identicalAsyncFunctionRegistered(id, f, config, abortable, prev)) {
+          return prev;
+        }
+        const timestamp = Date.now();
         const p = prev[id];
+        const isNew = !p;
         const n = isNew
           ? {
               id,
@@ -437,30 +445,66 @@ export const ElvisProvider: React.FunctionComponent<
               abortable,
               config,
             };
+        if (isNew) {
+          setupAbortControllerForNewAsyncFunction(id);
+        }
+        setWrappedFunctions((prev) => {
+          return {
+            ...prev,
+            [id]: async (...args: any) => {
+              return await createFunctionExecutionRequestAndGetPromise(
+                id,
+                timestamp,
+                args
+              );
+            },
+          };
+        });
         return { ...prev, [id]: n };
-      });
-      setWrappedFunctions((prev) => {
-        return {
-          ...prev,
-          [id]: async (...args: any) => {
-            return await createFunctionExecutionRequestAndGetPromise(
-              id,
-              timestamp,
-              args
-            );
-          },
-        };
       });
       return wrappedFunctions[id] as (...args: ArgsType) => Promise<ReturnType>;
     },
-    [registeredFunctions, abortControllers]
+    [registeredFunctions, abortControllers, wrappedFunctions]
+  );
+
+  //! USER FACING FUNCTIONS
+
+  const ufRegisterAbortable = useCallback(
+    <ArgsType extends any[], ReturnType>(
+      identifier: string,
+      f_unwrapped: (
+        abortController: AbortController,
+        ...args: ArgsType
+      ) => Promise<ReturnType>,
+      config: ElvisDisplayConfig
+    ) => {
+      return useRegisterAsyncFunctionAbortable(
+        identifier,
+        f_unwrapped,
+        config,
+        registerAbortable
+      );
+    },
+    [registerAbortable]
+  );
+  const ufRegisterUnabortable = useCallback(
+    <ArgsType extends any[], ReturnType>(
+      identifier: string,
+      f_unwrapped: (...args: ArgsType) => Promise<ReturnType>,
+      config: ElvisDisplayConfig
+    ) => {
+      return useRegisterAsyncFunction(
+        identifier,
+        f_unwrapped,
+        config,
+        registerUnabortable
+      );
+    },
+    [registerUnabortable]
   );
 
   const getAbortController = useCallback(
     (id: string) => {
-      if (!abortControllers[id]) {
-        throw new Error("No abort controller found for id " + id);
-      }
       return abortControllers[id];
     },
     [abortControllers]
@@ -505,9 +549,10 @@ export const ElvisProvider: React.FunctionComponent<
     <ElvisContext.Provider
       value={{
         async: {
-          register: registerUnabortable,
+          wrappedFunctions: wrappedFunctions,
+          register: ufRegisterUnabortable,
           abortable: {
-            register: registerAbortable,
+            register: ufRegisterAbortable,
             getAbortController,
           },
         },

@@ -78,10 +78,6 @@ const cancelsItselfAfterASpecifiedAmountOfTime_Cancellable = async (
   abortController: AbortController | undefined,
   seconds: number
 ) => {
-  console.log(
-    "in cancelsItselfAfterASpecifiedAmountOfTime_Cancellable",
-    abortController
-  );
   return new Promise((resolve, reject) => {
     abortableTimeout(
       abortController,
