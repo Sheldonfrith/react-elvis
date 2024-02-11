@@ -7,8 +7,6 @@ import React, {
 } from "react";
 import { customMockRequest } from "../lib/helpers/mockAsyncFunctions";
 import { assert } from "../lib/helpers/myAssert";
-import { customFunctionConfig } from "../lib/config/messages";
-import * as elvis from "react-elvis";
 
 //define types here
 

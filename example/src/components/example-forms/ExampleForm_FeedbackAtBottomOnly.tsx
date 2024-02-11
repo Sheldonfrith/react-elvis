@@ -25,7 +25,6 @@ https://github.com/Sheldonfrith/react-elvis
 */
 import React from "react";
 import { customMockRequest } from "../../lib/helpers/mockAsyncFunctions";
-import * as elvis from "react-elvis";
 import { customFunctionConfig } from "../../lib/config/messages";
 import TextInput from "./TextInputs";
 import SelectInput from "./SelectInput";
@@ -37,6 +36,7 @@ import {
   primaryButton,
 } from "../../styles/tailwindHelpers";
 import LoadingSpinner from "../LoadingSpinner";
+import { useElvis } from "../../react-elvis";
 
 interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
   formId: string;
@@ -44,21 +44,26 @@ interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
 const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
   ExampleForm_FeedbackAtBottomOnlyDisplayProps
 > = ({ formId }) => {
-  const { f: definedFunction, abortController: _ } = elvis.useWrap_Abortable(
-    "customFunction_" + formId,
-    (controller: AbortController, v: EventTarget) =>
-      customMockRequest(controller, v),
+  const elvis = useElvis();
+  const definedFunction = elvis.async.abortable.register(
+    formId,
+    customMockRequest,
     customFunctionConfig
   );
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!definedFunction) {
+      return;
+    }
     definedFunction(event.target);
   }
-  const { error, clearError, residualError } = elvis.useHandleErrorDisplay(
-    "customFunction_" + formId
+  const { error, clearError, residualError } =
+    elvis.display.error.handle(formId);
+  const { loading, cancelled, success } = elvis.display.loading.handle(
+    formId,
+    1000,
+    1000
   );
-  const { loading, cancelled, success, abortController } =
-    elvis.useHandleLoadingDisplay("customFunction_" + formId, 1000, 1000);
 
   return (
     <form
@@ -101,13 +106,13 @@ const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
             Submit
           </button>
         )}
-        {abortController && loading ? (
+        {elvis.async.abortable.getAbortController(formId) && loading ? (
           <button
             type="button"
             className={neutralButton}
             onClick={(e) => {
               e.preventDefault();
-              abortController.abort();
+              elvis.async.abortable.getAbortController(formId)?.abort();
             }}
           >
             Cancel

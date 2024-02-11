@@ -25,13 +25,12 @@ https://github.com/Sheldonfrith/react-elvis
 */
 import React, { useContext } from "react";
 import { customMockRequest } from "../../lib/helpers/mockAsyncFunctions";
-import * as elvis from "react-elvis";
-
 import { customFunctionConfig } from "../../lib/config/messages";
 import TextInput from "./TextInputs";
 import SelectInput from "./SelectInput";
 import { primaryButton } from "../../styles/tailwindHelpers";
 import { TestContext } from "../TestContext";
+import { useElvis } from "../../react-elvis";
 
 interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
   formId: string;
@@ -40,16 +39,18 @@ const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
   ExampleForm_FeedbackAtBottomOnlyDisplayProps
 > = ({ formId }) => {
   const context = useContext(TestContext);
-
-  const { f: definedFunction, abortController } = elvis.useWrap_Abortable(
+  const elvis = useElvis();
+  const definedFunction = elvis.async.abortable.register(
     "customFunction_" + formId,
-    context.testAsyncFunctionThatRequiresState_Unwrapped,
+    customMockRequest,
     customFunctionConfig
   );
-
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    definedFunction();
+    if (!definedFunction) {
+      return;
+    }
+    definedFunction(event.target);
   }
 
   return (

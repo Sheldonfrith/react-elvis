@@ -25,7 +25,6 @@ https://github.com/Sheldonfrith/react-elvis
 */
 import React, { useState, useEffect, ReactNode } from "react";
 import { customMockRequest } from "../../lib/helpers/mockAsyncFunctions";
-import * as elvis from "react-elvis";
 
 import { UserFacingError, UserFacingLoading } from "../../lib/config/types";
 import { customFunctionConfig } from "../../lib/config/messages";
@@ -41,6 +40,7 @@ import {
 } from "../../styles/tailwindHelpers";
 import LoadingSpinner from "../LoadingSpinner";
 import { usePrevious } from "../../lib/usePrevious";
+import { useElvis } from "../../react-elvis";
 
 interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
   formId: string;
@@ -48,6 +48,7 @@ interface ExampleForm_FeedbackAtBottomOnlyDisplayProps {
 const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
   ExampleForm_FeedbackAtBottomOnlyDisplayProps
 > = ({ formId }) => {
+  const elvis = useElvis();
   const [formFieldErrors, setFormFieldErrors] = useState<
     { field: string; error: UserFacingError }[]
   >([]);
@@ -58,22 +59,26 @@ const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
   const prevInputsWithRedBorders = usePrevious(inputsWithRedBorders);
   const [timeToCompletedField, setTimeToCompletedField] = useState<ReactNode>();
   const [resultTypeField, setResultTypeField] = useState<ReactNode>();
-  const { f: definedFunction, abortController: _ } = elvis.useWrap_Abortable(
-    "customFunction_" + formId,
-    (controller: AbortController, v: EventTarget) =>
-      customMockRequest(controller, v),
+  const definedFunction = elvis.async.abortable.register(
+    formId,
+    customMockRequest,
     customFunctionConfig
   );
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!definedFunction) {
+      return;
+    }
     definedFunction(event.target);
   }
-  const { error, clearError, residualError } = elvis.useHandleErrorDisplay(
-    "customFunction_" + formId
-  );
+  const { error, clearError, residualError } =
+    elvis.display.error.handle(formId);
   const prevResidualError = usePrevious(residualError);
-  const { loading, cancelled, success, abortController } =
-    elvis.useHandleLoadingDisplay("customFunction_" + formId, 1000, 1000);
+  const { loading, cancelled, success } = elvis.display.loading.handle(
+    formId,
+    1000,
+    1000
+  );
 
   //keep form field errors up to date
   useEffect(() => {
@@ -216,13 +221,13 @@ const ExampleForm_FeedbackAtBottomOnlyDisplay: React.FunctionComponent<
             Submit
           </button>
         )}
-        {abortController && loading ? (
+        {elvis.async.abortable.getAbortController(formId) && loading ? (
           <button
             type="button"
             className={badButton}
             onClick={(e) => {
               e.preventDefault();
-              abortController.abort();
+              elvis.async.abortable.getAbortController(formId)?.abort();
             }}
           >
             Cancel

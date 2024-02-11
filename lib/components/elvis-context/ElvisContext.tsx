@@ -37,13 +37,25 @@ export const ElvisContext = React.createContext({
     register: <ArgsType extends any[], ReturnType>(
       identifier: string,
       f: (...args: ArgsType) => Promise<ReturnType>,
-      config: ElvisDisplayConfig,
-      abortable: "abortable" | "not-abortable" = "not-abortable"
+      config: ElvisDisplayConfig
     ): ((...args: ArgsType) => Promise<ReturnType>) => {
       return (...args: any[]) => new Promise((resolve, reject) => {});
     },
-    getAbortController: (identifier: string) => {
-      new AbortController();
+    abortable: {
+      register: <ArgsType extends any[], ReturnType>(
+        identifier: string,
+        f: (
+          abortController: AbortController,
+          ...args: ArgsType
+        ) => Promise<ReturnType>,
+        config: ElvisDisplayConfig
+      ): ((...args: ArgsType) => Promise<ReturnType>) => {
+        return (...args: any[]) => new Promise((resolve, reject) => {});
+      },
+
+      getAbortController: (identifier: string) => {
+        new AbortController();
+      },
     },
   },
   display: {
