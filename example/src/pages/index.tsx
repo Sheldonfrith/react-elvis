@@ -31,38 +31,47 @@ import { useContext } from "react";
 export default function Home() {
   return (
     <main
-      className={`flex w-full min-h-screen flex-col items-center justify-between p-24`}
+      className={`flex w-full min-h-screen flex-col items-center justify-between p-24 pt-12`}
     >
-      <h1 className={`text-4xl font-bold text-center mb-8`}>
+      <div className={`flex flex-col w-full max-w-2xl`}>
+        <h1 className={`text-4xl font-bold text-center mb-8`}>
+          <a
+            href="https://github.com/sheldonfrith/react-elvis"
+            className="text-blue-500 hover:underline"
+          >
+            React-Elvis
+          </a>{" "}
+          Example Page
+        </h1>
         <a
+          className={`text-2xl font-bold text-center mb-8 text-blue-500 hover:underline cursor-pointer`}
           href="https://github.com/sheldonfrith/react-elvis"
-          className="text-blue-500 hover:underline"
         >
-          React-Elvis
-        </a>{" "}
-        Example Page
-      </h1>
-      <i className="mb-6">
-        💡 Type something non-numeric to see how input errors can be
-        displayed...
-      </i>
-      {/* <ElvisDefault /> */}
-      <h2 className={`text-2xl font-bold text-center`}>
-        {" "}
-        Feedback via Popup 📰
-      </h2>
-      <ExampleForm_NoFeedbackDisplay formId="viaGlobalPopup" />
-      <h1 className={`text-2xl font-bold text-center`}>
-        {" "}
-        Feedback at the Bottom ⬇️{" "}
-      </h1>
-      <ExampleForm_FeedbackAtBottomOnly formId="viaBottomOnly" />
+          See all the code on Github
+        </a>
 
-      <h1 className={`text-2xl font-bold text-center`}>
-        {" "}
-        Feedback Integrated 🤝{" "}
-      </h1>
-      <ExampleForm_IntegratedFeedback formId="viaVariousChannels" />
+        {/* <ElvisDefault /> */}
+        <h2 className={`text-2xl font-bold text-center`}>
+          {" "}
+          Feedback via Popup 📰
+        </h2>
+        <ExampleForm_NoFeedbackDisplay formId="viaGlobalPopup" />
+        <h1 className={`text-2xl font-bold text-center`}>
+          {" "}
+          Feedback at the Bottom ⬇️{" "}
+        </h1>
+
+        <ExampleForm_FeedbackAtBottomOnly formId="viaBottomOnly" />
+        <i className="mb-6">
+          💡 Hint: Type something non-numeric to see how input errors can be
+          displayed...
+        </i>
+        <h1 className={`text-2xl font-bold text-center`}>
+          {" "}
+          Feedback Integrated 🤝{" "}
+        </h1>
+        <ExampleForm_IntegratedFeedback formId="viaVariousChannels" />
+      </div>
     </main>
   );
 }
