@@ -28,7 +28,7 @@ export function useRegisterAsyncFunctionAbortable<
   //initial registration
   useEffect(() => {
     registerFunction(identifier, f_unwrapped, config);
-  }, []);
+  }, [f_unwrapped]);
   // keep up to date
   useEffect(() => {
     if (elvis.async.wrappedFunctions === prevWrappedFunctions) return;

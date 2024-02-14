@@ -27,3 +27,14 @@ export { ElvisProvider } from "./components/elvis-context/ElvisProvider";
 export { ElvisContext } from "./components/elvis-context/ElvisContext";
 export { ElvisDefault } from "./components/elvis-default/ElvisDefault";
 export { useElvis } from "./hooks/useElvis";
+export type {
+  ElvisConfig,
+  UserFacingError,
+  UserFacingLoading,
+  UserFacingSuccess,
+  UserFacingCancelled,
+  UserFacingErrorFilter,
+  LoadingDisplayer,
+  ErrorDisplayer,
+  ElvisDisplayConfig,
+} from "./helpers/types";

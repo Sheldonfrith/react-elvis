@@ -16,10 +16,10 @@ export function useRegisterAsyncFunction<ArgsType extends any[], ReturnType>(
   const elvis = useContext(ElvisContext);
   const [f, setF] = useState<(...args: ArgsType) => Promise<ReturnType>>();
   const prevWrappedFunctions = usePrevious(elvis.async.wrappedFunctions);
-  //initial registration
+  //call register whenever dependency changes
   useEffect(() => {
     registerFunction(identifier, f_unwrapped, config);
-  }, []);
+  }, [f_unwrapped, identifier, config]);
   // keep up to date
   useEffect(() => {
     if (elvis.async.wrappedFunctions === prevWrappedFunctions) return;

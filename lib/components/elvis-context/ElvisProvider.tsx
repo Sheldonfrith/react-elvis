@@ -365,54 +365,6 @@ export const ElvisProvider: React.FunctionComponent<
 
   //! NEW FUNCTION REGISTRATION FUNCTIONS //
 
-  const registerUnabortable = useCallback(
-    <ArgsType extends any[], ReturnType>(
-      id: string,
-      f: (...args: ArgsType) => Promise<ReturnType>,
-      config: ElvisDisplayConfig
-    ): ((...args: ArgsType) => Promise<ReturnType>) => {
-      const abortable = "not-abortable" as const;
-      setRegisteredFunctions((prev) => {
-        if (identicalAsyncFunctionRegistered(id, f, config, abortable, prev)) {
-          return prev;
-        }
-        const timestamp = Date.now();
-        const p = prev[id];
-        const isNew = !p;
-        const n = isNew
-          ? {
-              id,
-              versionTimestamp: timestamp,
-              callback: f,
-              abortable,
-              config,
-            }
-          : {
-              ...p,
-              versionTimestamp: timestamp,
-              callback: f,
-              abortable,
-              config,
-            };
-        setWrappedFunctions((prev) => {
-          return {
-            ...prev,
-            [id]: async (...args: any) => {
-              return await createFunctionExecutionRequestAndGetPromise(
-                id,
-                timestamp,
-                args
-              );
-            },
-          };
-        });
-        return { ...prev, [id]: n };
-      });
-      return wrappedFunctions[id] as (...args: ArgsType) => Promise<ReturnType>;
-    },
-    [registeredFunctions, abortControllers]
-  );
-
   const registerAbortable = useCallback(
     <ArgsType extends any[], ReturnType>(
       id: string,
@@ -445,9 +397,57 @@ export const ElvisProvider: React.FunctionComponent<
               abortable,
               config,
             };
-        if (isNew) {
+        if (isNew && abortable === "abortable") {
           setupAbortControllerForNewAsyncFunction(id);
         }
+        setWrappedFunctions((prev) => {
+          return {
+            ...prev,
+            [id]: async (...args: any) => {
+              return await createFunctionExecutionRequestAndGetPromise(
+                id,
+                timestamp,
+                args
+              );
+            },
+          };
+        });
+        return { ...prev, [id]: n };
+      });
+      return wrappedFunctions[id] as (...args: ArgsType) => Promise<ReturnType>;
+    },
+    [registeredFunctions, abortControllers, wrappedFunctions]
+  );
+
+  const registerUnabortable = useCallback(
+    <ArgsType extends any[], ReturnType>(
+      id: string,
+      f: (...args: ArgsType) => Promise<ReturnType>,
+      config: ElvisDisplayConfig
+    ): ((...args: ArgsType) => Promise<ReturnType>) => {
+      const abortable = "not-abortable" as const;
+      setRegisteredFunctions((prev) => {
+        if (identicalAsyncFunctionRegistered(id, f, config, abortable, prev)) {
+          return prev;
+        }
+        const timestamp = Date.now();
+        const p = prev[id];
+        const isNew = !p;
+        const n = isNew
+          ? {
+              id,
+              versionTimestamp: timestamp,
+              callback: f,
+              abortable,
+              config,
+            }
+          : {
+              ...p,
+              versionTimestamp: timestamp,
+              callback: f,
+              abortable,
+              config,
+            };
         setWrappedFunctions((prev) => {
           return {
             ...prev,
