@@ -51,12 +51,15 @@ import { useLoadingDisplaySetup } from "../../hooks/useLoadingDisplaySetup";
 import { ElvisContext } from "./ElvisContext";
 import { findErrorDisplayers_Internals } from "./helpers/findErrorDisplayers_Internals";
 import { handleErrorDetected_Internals } from "./helpers/handleErrorDetected_Internals";
-import { processAsyncFunctionExecutionQueue } from "./helpers/processAsyncFunctionExecutionQueue";
 import { identicalAsyncFunctionRegistered } from "./helpers/identicalAsyncFunctionRegistered";
 import { catchPromiseErrors } from "./helpers/catchPromiseErrors";
 import { useRegisterAsyncFunction } from "../../hooks/useRegisterAsyncFunction";
 import { useRegisterAsyncFunctionAbortable } from "../../hooks/useRegisterAsyncFunctionAbortable";
 import { resetableAbortController } from "./helpers/resetableAbortController";
+import {
+  processAsyncFunctionExecutionRequest,
+  processQueue,
+} from "./helpers/processAsyncFunctionExecutionQueue";
 
 export const ElvisProvider: React.FunctionComponent<
   PropsWithChildren<{ config?: ElvisConfig }>
@@ -85,7 +88,15 @@ export const ElvisProvider: React.FunctionComponent<
   >({});
   const [asyncFunctionExecutionQueue, setAsyncFunctionExecutionQueue] =
     useState<FunctionExecutionRequest[]>([]);
+
   const [abortEventsQueue, setAbortEventsQueue] = useState<string[]>([]);
+
+  //! DEBUGGING //
+  useEffect(() => {
+    console.log("asyncFunctionExecutionQueue", asyncFunctionExecutionQueue);
+  }, [asyncFunctionExecutionQueue]);
+
+  //!
 
   // ! HELPER TO SETUP ABORT CONTROLLER ON NEW REGISTER REQUEST //
   const setupAbortControllerForNewAsyncFunction = useCallback(
@@ -121,10 +132,9 @@ export const ElvisProvider: React.FunctionComponent<
 
   //! Handling function executions //
 
-  //handle async function executions, try all of them whenever execution queue or registered functions changes
   useEffect(() => {
     if (!asyncFunctionExecutionQueue.length) return;
-    processAsyncFunctionExecutionQueue(
+    processQueue(
       asyncFunctionExecutionQueue,
       registeredFunctions,
       runAsyncFunctionWithEventHandlers,
@@ -342,6 +352,7 @@ export const ElvisProvider: React.FunctionComponent<
       } catch (error) {
         handleLoadingEnd(f.id);
         handleErrorDetected(f.id, error);
+        console.error("Error handled by react-elvis", error);
       }
     },
     [

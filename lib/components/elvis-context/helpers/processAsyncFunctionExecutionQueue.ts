@@ -28,47 +28,68 @@ import {
   UserFacingAsyncFunction,
 } from "../../../helpers/types";
 
-export async function processAsyncFunctionExecutionQueue(
-  asyncFunctionExecutionQueue: FunctionExecutionRequest[],
+export async function processAsyncFunctionExecutionRequest(
+  executionRequest: FunctionExecutionRequest,
   registeredFunctions: Record<string, UserFacingAsyncFunction<any>>,
-  functionWrapper: (f: UserFacingAsyncFunction, args: any) => Promise<any>,
-  setAsyncFunctionExecutionQueue: React.Dispatch<
-    React.SetStateAction<FunctionExecutionRequest[]>
-  >
+  functionWrapper: (f: UserFacingAsyncFunction, args: any) => Promise<any>
 ) {
   const maxWaitTime = 2000;
-  const toRemove: FunctionExecutionRequest[] = [];
   // whenever a new execution request is added, or whenever a function changes
   const now = Date.now();
-  await Promise.all(
-    [...asyncFunctionExecutionQueue].map(async (executionRequest) => {
-      const howOld = now - executionRequest.calledAt;
-      if (howOld > maxWaitTime) {
-        throw new Error(
-          `We were unable to execute the function in time. Function: ${executionRequest.id}. Args: ${executionRequest.args} `
+  const howOld = now - executionRequest.calledAt;
+  if (howOld > maxWaitTime) {
+    executionRequest.reject(
+      new Error(
+        `We were unable to execute the function in time. Function: ${executionRequest.id}. Args: ${executionRequest.args} `
+      )
+    );
+    return;
+  }
+  const match = registeredFunctions[executionRequest.id];
+  if (!match) {
+    executionRequest.reject(
+      new Error(
+        `We were unable to find a registered function with the id: ${executionRequest.id}`
+      )
+    );
+  } else {
+    // if the current function is the same age or newer than our timestamp then we can run it
+    if (match.versionTimestamp >= executionRequest.versionTimestamp) {
+      try {
+        executionRequest.resolve(
+          await functionWrapper(match, executionRequest.args)
         );
+      } catch (e) {
+        executionRequest.reject(e);
       }
-      const match = registeredFunctions[executionRequest.id];
-      if (!match) {
-        return; // still waiting
-      } else {
-        // if the current function is the same age or newer than our timestamp then we can run it
-        if (match.versionTimestamp >= executionRequest.versionTimestamp) {
-          try {
-            executionRequest.resolve(
-              await functionWrapper(match, executionRequest.args)
-            );
-          } catch (e) {
-            executionRequest.reject(e);
-          }
-          toRemove.push(executionRequest);
-        }
-      }
-    })
-  );
-  if (toRemove.length > 0) {
-    setAsyncFunctionExecutionQueue((prev) => {
-      return prev.filter((e) => !toRemove.includes(e));
-    });
+    }
+  }
+}
+
+export async function processQueue(
+  queue: FunctionExecutionRequest[],
+  registeredFunctions: Record<string, UserFacingAsyncFunction<any>>,
+  functionWrapper: (f: UserFacingAsyncFunction, args: any) => Promise<any>,
+  setQueue: (queue: FunctionExecutionRequest[]) => void
+) {
+  if (queue.length > 0) {
+    // Execute the first item in the queue
+    const [currentItem, ...remainingItems] = queue;
+    setQueue(remainingItems);
+
+    // Process the rest of the queue after the current item
+    await processQueue(
+      remainingItems,
+      registeredFunctions,
+      functionWrapper,
+      setQueue
+    );
+
+    // Execute the current item
+    await processAsyncFunctionExecutionRequest(
+      currentItem,
+      registeredFunctions,
+      functionWrapper
+    );
   }
 }
