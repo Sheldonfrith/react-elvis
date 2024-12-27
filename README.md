@@ -126,6 +126,8 @@ export type ElvisConfig = {
 
 ### 2. Create Custom Display Components
 
+*For most non-trivial applications the provided default displayer component will probably fall short of the requirements. Instead of making an overly complex universal default component, the recommended approach is to create custom displayer components whenever you want to display error, loading or success states in a way different from the norm in your application.*
+
 #### Basic Usage (See the "example" app for details and advanced usage):
 
 ```TSX
@@ -214,7 +216,11 @@ export default function AnyComponent(){
 }
 ```
 
-##### Details:
+##### Example Custom Displayer
+
+
+
+##### API:
 
 ```TSX
 
